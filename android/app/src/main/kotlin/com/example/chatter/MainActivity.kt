@@ -1,4 +1,4 @@
-package com.example.chatter
+package com.luke.chatter
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
