@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/models/on_boarding.dart';
 
-class OnBoardingWidget extends StatefulWidget {
+class OnBoardingPage extends StatefulWidget {
   @override
-  _OnBoardingWidgetState createState() => _OnBoardingWidgetState();
+  _OnBoardingPageState createState() => _OnBoardingPageState();
 }
 
-class _OnBoardingWidgetState extends State<OnBoardingWidget> {
+class _OnBoardingPageState extends State<OnBoardingPage> {
   int _current = 0;
   OnBoardingList _onBoardingList;
   CarouselSlider slider;
@@ -37,7 +37,8 @@ class _OnBoardingWidgetState extends State<OnBoardingWidget> {
   }
 
   onContinue() {
-    // Navigator.of(context).pushNamed('/SignUp');
+    // Navigator.of(context).pushReplacementNamed('/InputPhone');
+    Navigator.of(context).pushNamed('/InputPhone');
   }
 
   isLastPage() {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:chatter/src/screens/on_boarding.dart';
+import 'package:chatter/src/screens/init/on_boarding.dart';
+import 'package:chatter/src/screens/init/input_phone.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -8,7 +9,9 @@ class RouteGenerator {
 
     switch (settings.name) {
       case '/':
-        return MaterialPageRoute(builder: (_) => OnBoardingWidget());
+        return MaterialPageRoute(builder: (_) => OnBoardingPage());
+      case '/InputPhone':
+        return MaterialPageRoute(builder: (_) => InputPhonePage());
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();
