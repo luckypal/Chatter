@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 class InputPhonePage extends StatefulWidget {
   @override
@@ -9,7 +11,12 @@ class InputPhonePage extends StatefulWidget {
 }
 
 class _InputPhonePageState extends State<InputPhonePage> {
+  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   CountryCode mCode;
+  String strPhoneNumber = "7865778328";
+
+  String actualCode;
+  String status = "";
 
   @override
   void initState() {
@@ -26,8 +33,79 @@ class _InputPhonePageState extends State<InputPhonePage> {
     });
   }
 
+  void onPhoneNumberChanged(number) {
+    setState(() {
+      strPhoneNumber = number;
+    });
+  }
+
   void onSendSMSCode() {
+    String phoneNumber = mCode.dialCode + strPhoneNumber;
+
+    final PhoneCodeSent codeSent = (String verificationId, [int forceResendingToken]) async {
+      this.actualCode = verificationId;
+      setState(() {
+        print('Code sent to $phoneNumber');
+        status = "\nEnter the code sent to " + phoneNumber;
+      });
+    };
+
+    final PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
+        (String verificationId) {
+      this.actualCode = verificationId;
+      setState(() {
+        status = "\nAuto retrieval time out";
+      });
+    };
     
+    final PhoneVerificationFailed verificationFailed =
+        (AuthException authException) {
+      setState(() {
+        status = '${authException.message}';
+
+        print("Error message: " + status);
+        if (authException.message.contains('not authorized'))
+          status = 'Something has gone wrong, please try later';
+        else if (authException.message.contains('Network'))
+          status = 'Please check your internet connection and try again';
+        else
+          status = 'Something has gone wrong, please try later';
+      });
+    };
+    final PhoneVerificationCompleted verificationCompleted =
+    (AuthCredential auth) {
+      setState(() {
+        status = 'Auto retrieving verification code';
+      });
+      //_authCredential = auth;
+
+      /*firebaseAuth
+        .signInWithCredential(_authCredential)
+        .then((AuthResult value) {
+        if (value.user != null) {
+          setState(() {
+            status = 'Authentication successful';
+          });
+          // onAuthenticationSuccessful();
+        } else {
+          setState(() {
+            status = 'Invalid code/invalid authentication';
+          });
+        }
+      }).catchError((error) {
+        setState(() {
+          status = 'Something has gone wrong, please try later';
+        });
+      });*/
+    };
+
+    firebaseAuth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      timeout: Duration(seconds: 60),
+      verificationCompleted: verificationCompleted,
+      verificationFailed: verificationFailed,
+      codeSent: codeSent,
+      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
   }
 
   @override
@@ -86,6 +164,7 @@ class _InputPhonePageState extends State<InputPhonePage> {
                     Expanded(
                       flex: 1,
                       child: TextField(
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           hintText: 'Enter your phone number',
                           hintStyle: TextStyle(color: Theme.of(context).focusColor.withOpacity(0.8)),
@@ -94,6 +173,7 @@ class _InputPhonePageState extends State<InputPhonePage> {
                           focusedBorder: UnderlineInputBorder(borderSide: BorderSide.none),
                         ),
                         style: Theme.of(context).textTheme.title,
+                        onChanged: onPhoneNumberChanged,
                       ),
                     ),
                   ]
@@ -101,9 +181,15 @@ class _InputPhonePageState extends State<InputPhonePage> {
               ),
 
               Container(
+                child: Text(
+                  status
+                ),
+              ),
+
+              Container(
                 alignment: Alignment.centerRight,
                 child:FlatButton(
-                  onPressed: onSendSMSCode,
+                  onPressed: strPhoneNumber.isEmpty ? null : onSendSMSCode,
                   child: Text(
                     'Send SMS Code',
                     style: Theme.of(context).textTheme.button,
@@ -111,7 +197,7 @@ class _InputPhonePageState extends State<InputPhonePage> {
                   color: Theme.of(context).accentColor,
                   shape: StadiumBorder(),
                 ),
-              )
+              ),
             ]
           )
         )
