@@ -1,8 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:chatter/config/app_config.dart' as config;
-import 'package:chatter/src/models/on_boarding.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:chatter/config/app_config.dart' as config;
+import 'package:chatter/src/models/on_boarding.dart';
 
 class OnBoardingWidget extends StatefulWidget {
   @override
@@ -28,12 +28,16 @@ class _OnBoardingWidgetState extends State<OnBoardingWidget> {
   }
 
   onNext() {
-    if (isLastPage())
-      Navigator.of(context).pushNamed('/SignUp');
-    else
+    if (isLastPage()) {
+      onContinue();
+    } else
       slider.nextPage(
           duration: slider.autoPlayAnimationDuration,
           curve: slider.autoPlayCurve);
+  }
+
+  onContinue() {
+    // Navigator.of(context).pushNamed('/SignUp');
   }
 
   isLastPage() {
