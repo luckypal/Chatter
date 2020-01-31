@@ -12,10 +12,76 @@ class OnBoardingWidget extends StatefulWidget {
 class _OnBoardingWidgetState extends State<OnBoardingWidget> {
   int _current = 0;
   OnBoardingList _onBoardingList;
+  CarouselSlider slider;
+
   @override
   void initState() {
     _onBoardingList = new OnBoardingList();
+    slider = getSlider();
     super.initState();
+  }
+
+  onSkip() {
+    slider.animateToPage(lastPageIndex(),
+        duration: slider.autoPlayAnimationDuration,
+        curve: slider.autoPlayCurve);
+  }
+
+  onNext() {
+    if (isLastPage())
+      Navigator.of(context).pushNamed('/SignUp');
+    else
+      slider.nextPage(
+          duration: slider.autoPlayAnimationDuration,
+          curve: slider.autoPlayCurve);
+  }
+
+  isLastPage() {
+    return _current == lastPageIndex();
+  }
+
+  lastPageIndex() {
+    return _onBoardingList.list.length - 1;
+  }
+
+  getSlider() {
+    return CarouselSlider(
+      enableInfiniteScroll: false,
+      height: 500.0,
+      viewportFraction: 1.0,
+      onPageChanged: (index) {
+        setState(() {
+          _current = index;
+        });
+      },
+      items: _onBoardingList.list.map((OnBoarding boarding) {
+        return Builder(
+          builder: (BuildContext context) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Image.asset(
+                    boarding.image,
+                    width: 500,
+                  ),
+                ),
+                Container(
+                  width: config.App(context).appWidth(75),
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Text(
+                    boarding.description,
+                    style: Theme.of(context).textTheme.display1,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      }).toList(),
+    );
   }
 
   @override
@@ -29,7 +95,7 @@ class _OnBoardingWidgetState extends State<OnBoardingWidget> {
             Padding(
               padding: const EdgeInsets.only(right: 20, top: 50),
               child: FlatButton(
-                onPressed: () {},
+                onPressed: isLastPage() ? null : onSkip,
                 child: Text(
                   'Skip',
                   style: Theme.of(context).textTheme.button,
@@ -38,42 +104,7 @@ class _OnBoardingWidgetState extends State<OnBoardingWidget> {
                 shape: StadiumBorder(),
               ),
             ),
-            CarouselSlider(
-              height: 500.0,
-              viewportFraction: 1.0,
-              onPageChanged: (index) {
-                setState(() {
-                  _current = index;
-                });
-              },
-              items: _onBoardingList.list.map((OnBoarding boarding) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Image.asset(
-                            boarding.image,
-                            width: 500,
-                          ),
-                        ),
-                        Container(
-                          width: config.App(context).appWidth(75),
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Text(
-                            boarding.description,
-                            style: Theme.of(context).textTheme.display1,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }).toList(),
-            ),
+            slider,
             Container(
               width: config.App(context).appWidth(75),
               child: Row(
@@ -82,31 +113,31 @@ class _OnBoardingWidgetState extends State<OnBoardingWidget> {
                   return Container(
                     width: 25.0,
                     height: 3.0,
-                    margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                    margin:
+                        EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.all(
                           Radius.circular(8),
                         ),
-                        color: _current == _onBoardingList.list.indexOf(boarding)
-                            ? Theme.of(context).hintColor.withOpacity(0.8)
-                            : Theme.of(context).hintColor.withOpacity(0.2)),
+                        color:
+                            _current == _onBoardingList.list.indexOf(boarding)
+                                ? Theme.of(context).hintColor.withOpacity(0.8)
+                                : Theme.of(context).hintColor.withOpacity(0.2)),
                   );
                 }).toList(),
               ),
             ),
             Container(
               width: config.App(context).appWidth(75),
-              padding: const EdgeInsets.symmetric(vertical: 50),
+              padding: EdgeInsets.only(top: 50),
               child: FlatButton(
                 padding: EdgeInsets.symmetric(horizontal: 35, vertical: 12),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/SignUp');
-                },
+                onPressed: this.onNext,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      'Get Start',
+                      _current != lastPageIndex() ? 'Next' : 'Agree & Continue',
                       style: Theme.of(context).textTheme.display1.merge(
                             TextStyle(color: Theme.of(context).primaryColor),
                           ),

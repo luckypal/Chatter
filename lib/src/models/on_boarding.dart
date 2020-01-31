@@ -25,6 +25,9 @@ class OnBoardingList {
       new OnBoarding(
           image: 'assets/images/onboarding3.png',
           description: 'A room with different messenger users.'),
+      new OnBoarding(
+          image: 'assets/images/onboarding4.png',
+          description: 'Read our Private Policy, and tap "Agree & Continue" to accept the Terms of Service.'),
     ];
   }
 }
