@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chatter',
-      initialRoute: '/PhoneVerify',
+      initialRoute: '/PhoneInput',
       onGenerateRoute: RouteGenerator.generateRoute,
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(

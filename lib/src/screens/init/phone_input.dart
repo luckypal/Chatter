@@ -1,3 +1,4 @@
+import 'package:chatter/src/screens/init/phone_verify.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -16,7 +17,7 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
   CountryCode mCode;
   String strPhoneNumber = "7865778328";
 
-  String actualCode;
+  String verificationId;
   String status = "";
 
   @override
@@ -44,8 +45,13 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
     String phoneNumber = mCode.dialCode + strPhoneNumber;
 
     final PhoneCodeSent codeSent = (String verificationId, [int forceResendingToken]) async {
-      this.actualCode = verificationId;
+      this.verificationId = verificationId;
       Navigator.pop(context);
+      Navigator.pushNamed(context, "/PhoneVerify", arguments: new PhoneInputArguments(
+        verificationId: verificationId,
+        countryCode: mCode,
+        phoneNumber: phoneNumber
+      ));
       setState(() {
         print('Code sent to $phoneNumber');
         status = "\nEnter the code sent to " + phoneNumber;
@@ -54,7 +60,8 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
 
     final PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
         (String verificationId) {
-      this.actualCode = verificationId;
+      // UI.showAlert(context, content: "Auto retrieval time out");
+      this.verificationId = verificationId;
       setState(() {
         status = "\nAuto retrieval time out";
       });
@@ -84,7 +91,7 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
 
     firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
-      timeout: Duration(seconds: 60),
+      timeout: Duration(seconds: 5),
       verificationCompleted: verificationCompleted,
       verificationFailed: verificationFailed,
       codeSent: codeSent,
@@ -166,11 +173,11 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
                 )
               ),
 
-              Container(
-                child: Text(
-                  status
-                ),
-              ),
+              // Container(
+              //   child: Text(
+              //     status
+              //   ),
+              // ),
 
               Container(
                 alignment: Alignment.centerRight,

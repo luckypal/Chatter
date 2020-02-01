@@ -14,7 +14,7 @@ class RouteGenerator {
       case '/PhoneInput':
         return MaterialPageRoute(builder: (_) => PhoneInputPage());
       case '/PhoneVerify':
-        return MaterialPageRoute(builder: (_) => PhoneVerifyPage());
+        return MaterialPageRoute(builder: (_) => PhoneVerifyPage(args: args));
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();
