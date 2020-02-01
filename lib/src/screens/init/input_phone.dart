@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:chatter/config/app_config.dart' as config;
 import 'package:country_code_picker/country_code_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
+// import 'package:flutter/services.dart';
+import 'package:chatter/config/app_config.dart' as config;
+import 'package:chatter/src/utils/ui.dart';
 
 class InputPhonePage extends StatefulWidget {
   @override
@@ -44,6 +45,7 @@ class _InputPhonePageState extends State<InputPhonePage> {
 
     final PhoneCodeSent codeSent = (String verificationId, [int forceResendingToken]) async {
       this.actualCode = verificationId;
+      Navigator.pop(context);
       setState(() {
         print('Code sent to $phoneNumber');
         status = "\nEnter the code sent to " + phoneNumber;
@@ -60,6 +62,7 @@ class _InputPhonePageState extends State<InputPhonePage> {
     
     final PhoneVerificationFailed verificationFailed =
         (AuthException authException) {
+      Navigator.pop(context);
       setState(() {
         status = '${authException.message}';
 
@@ -74,29 +77,10 @@ class _InputPhonePageState extends State<InputPhonePage> {
     };
     final PhoneVerificationCompleted verificationCompleted =
     (AuthCredential auth) {
+      Navigator.pop(context);
       setState(() {
         status = 'Auto retrieving verification code';
       });
-      //_authCredential = auth;
-
-      /*firebaseAuth
-        .signInWithCredential(_authCredential)
-        .then((AuthResult value) {
-        if (value.user != null) {
-          setState(() {
-            status = 'Authentication successful';
-          });
-          // onAuthenticationSuccessful();
-        } else {
-          setState(() {
-            status = 'Invalid code/invalid authentication';
-          });
-        }
-      }).catchError((error) {
-        setState(() {
-          status = 'Something has gone wrong, please try later';
-        });
-      });*/
     };
 
     firebaseAuth.verifyPhoneNumber(
@@ -106,6 +90,8 @@ class _InputPhonePageState extends State<InputPhonePage> {
       verificationFailed: verificationFailed,
       codeSent: codeSent,
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
+      
+    UI.showSpinnerOverlay(context);
   }
 
   @override
@@ -121,85 +107,96 @@ class _InputPhonePageState extends State<InputPhonePage> {
           style: Theme.of(context).textTheme.display3,
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 15),
-              Text(
-                'Confirm your country and enter your phone number(s)',
-                textAlign: TextAlign.left,
-                style: Theme.of(context).textTheme.body2,
-              ),
-
-              CountryCodePicker(
-                onChanged: onChangeCountry,
-                initialSelection: mCode.code,
-                favorite: ["US"],
-                showFlag: true,
-                showOnlyCountryWhenClosed: true,
-                alignLeft: true,
-                textStyle: Theme.of(context).textTheme.title
-              ),
-
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(color: Theme.of(context).hintColor.withOpacity(0.10), offset: Offset(0, 4), blurRadius: 10)
-                  ],
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        mCode.dialCode,
-                        style: Theme.of(context).textTheme.title,
-                      )
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: TextField(
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: 'Enter your phone number',
-                          hintStyle: TextStyle(color: Theme.of(context).focusColor.withOpacity(0.8)),
-                          border: UnderlineInputBorder(borderSide: BorderSide.none),
-                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
-                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide.none),
-                        ),
-                        style: Theme.of(context).textTheme.title,
-                        onChanged: onPhoneNumberChanged,
-                      ),
-                    ),
-                  ]
-                )
-              ),
-
-              Container(
-                child: Text(
-                  status
-                ),
-              ),
-
-              Container(
-                alignment: Alignment.centerRight,
-                child:FlatButton(
-                  onPressed: strPhoneNumber.isEmpty ? null : onSendSMSCode,
-                  child: Text(
-                    'Send SMS Code',
-                    style: Theme.of(context).textTheme.button,
+      body: 
+      SingleChildScrollView(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(height: 15),
+                  Text(
+                    'Confirm your country and enter your phone number(s)',
+                    textAlign: TextAlign.left,
+                    style: Theme.of(context).textTheme.body2,
                   ),
-                  color: Theme.of(context).accentColor,
-                  shape: StadiumBorder(),
-                ),
-              ),
-            ]
-          )
+
+                  CountryCodePicker(
+                    onChanged: onChangeCountry,
+                    initialSelection: mCode.code,
+                    favorite: ["US"],
+                    showFlag: true,
+                    showOnlyCountryWhenClosed: true,
+                    alignLeft: true,
+                    textStyle: Theme.of(context).textTheme.title
+                  ),
+
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(color: Theme.of(context).hintColor.withOpacity(0.10), offset: Offset(0, 4), blurRadius: 10)
+                      ],
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            mCode.dialCode,
+                            style: Theme.of(context).textTheme.title,
+                          )
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: TextField(
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Enter your phone number',
+                              hintStyle: TextStyle(color: Theme.of(context).focusColor.withOpacity(0.8)),
+                              border: UnderlineInputBorder(borderSide: BorderSide.none),
+                              enabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
+                              focusedBorder: UnderlineInputBorder(borderSide: BorderSide.none),
+                            ),
+                            style: Theme.of(context).textTheme.title,
+                            onChanged: onPhoneNumberChanged,
+                          ),
+                        ),
+                      ]
+                    )
+                  ),
+
+                  Container(
+                    child: Text(
+                      status
+                    ),
+                  ),
+
+                  Container(
+                    alignment: Alignment.centerRight,
+                    child:FlatButton(
+                      onPressed: strPhoneNumber.isEmpty ? null : onSendSMSCode,
+                      child: Text(
+                        'Send SMS Code',
+                        style: Theme.of(context).textTheme.button,
+                      ),
+                      color: Theme.of(context).accentColor,
+                      shape: StadiumBorder(),
+                    ),
+                  ),
+                ]
+              )
+            ),
+            Padding(
+              padding: EdgeInsets.all(0),
+              child: Container(
+                color: Colors.red,
+              )
+            )
+          ]
         )
       )
     );
