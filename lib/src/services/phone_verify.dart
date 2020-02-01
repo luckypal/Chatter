@@ -34,6 +34,7 @@ class PhoneVerifyServiceImpl extends PhoneVerifyService {
   @override
   void phoneVerify(String phoneNumber) {
     _phoneNumber = phoneNumber;
+    isDone = false;
 
     firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,

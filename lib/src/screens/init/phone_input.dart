@@ -35,6 +35,7 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
   }
 
   void setServiceFunction() {
+    phoneVerifyService.isDone = true;
     phoneVerifyService.onCodeSent = (String phoneNumberWithCode, String verificationId, [int forceResendingToken]) async {
       UI.closeSpinnerOverlay(context);
 

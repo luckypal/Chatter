@@ -254,13 +254,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.6.0+1"
-  pin_entry_text_field:
+  pin_code_fields:
     dependency: "direct main"
     description:
-      name: pin_entry_text_field
+      name: pin_code_fields
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.4"
+    version: "2.3.0+3"
   provider:
     dependency: "direct main"
     description:
