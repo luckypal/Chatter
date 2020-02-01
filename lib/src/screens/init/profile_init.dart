@@ -50,7 +50,7 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
               Container(
                 alignment: Alignment.centerRight,
                 child:FlatButton(
-                  onPressed: () {},
+                  onPressed: () {/*FirebaseAuth.instance.signOut();*/},
                   child: Text(
                     'Done',
                     style: Theme.of(context).textTheme.button,

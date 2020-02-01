@@ -26,6 +26,8 @@ abstract class PhoneVerifyService {
   void codeAutoRetrievalTimeout(String verificationId) {
     !isDone && onCodeAutoRetrievalTimeout(verificationId);
   }
+
+  Future<FirebaseUser> getCurrentUser();
 }
 
 class PhoneVerifyServiceImpl extends PhoneVerifyService {
@@ -43,5 +45,11 @@ class PhoneVerifyServiceImpl extends PhoneVerifyService {
       verificationFailed: verificationFailed,
       codeSent: codeSent,
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
+  }
+
+  @override
+  Future<FirebaseUser> getCurrentUser() async {
+    FirebaseUser user = await firebaseAuth.currentUser();
+    return user;
   }
 }

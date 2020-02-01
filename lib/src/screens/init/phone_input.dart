@@ -17,7 +17,7 @@ class PhoneInputPage extends StatefulWidget {
 class _PhoneInputPageState extends State<PhoneInputPage> {
   PhoneVerifyService phoneVerifyService;
   CountryCode mCode;
-  String strPhoneNumber = "7865778328";
+  String strPhoneNumber = "";
 
   String verificationId;
   String status = "";
@@ -36,6 +36,11 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
 
   void setServiceFunction() {
     phoneVerifyService.isDone = true;
+    phoneVerifyService.onVerificationFailed = (AuthException exception) {
+      UI.closeSpinnerOverlay(context);
+      UI.showAlert(context, content: exception.message);
+    };
+
     phoneVerifyService.onCodeSent = (String phoneNumberWithCode, String verificationId, [int forceResendingToken]) async {
       UI.closeSpinnerOverlay(context);
 
@@ -66,61 +71,6 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
 
     UI.showSpinnerOverlay(context);
     phoneVerifyService.phoneVerify(phoneNumber);
-
-    /*final PhoneCodeSent codeSent = (String verificationId, [int forceResendingToken]) async {
-      this.verificationId = verificationId;
-      Navigator.pop(context);
-      Navigator.pushNamed(context, "/PhoneVerify", arguments: new PhoneInputArguments(
-        verificationId: verificationId,
-        countryCode: mCode,
-        phoneNumber: phoneNumber
-      ));
-      setState(() {
-        print('Code sent to $phoneNumber');
-        status = "\nEnter the code sent to " + phoneNumber;
-      });
-    };
-
-    final PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout =
-        (String verificationId) {
-      // UI.showAlert(context, content: "Auto retrieval time out");
-      this.verificationId = verificationId;
-      setState(() {
-        status = "\nAuto retrieval time out";
-      });
-    };
-    
-    final PhoneVerificationFailed verificationFailed =
-        (AuthException authException) {
-      Navigator.pop(context);
-      setState(() {
-        status = '${authException.message}';
-
-        print("Error message: " + status);
-        if (authException.message.contains('not authorized'))
-          status = 'Something has gone wrong, please try later';
-        else if (authException.message.contains('Network'))
-          status = 'Please check your internet connection and try again';
-        else
-          status = 'Something has gone wrong, please try later';
-      });
-    };
-    final PhoneVerificationCompleted verificationCompleted = (AuthCredential auth) {
-      Navigator.pop(context);
-      setState(() {
-        status = 'Auto retrieving verification code';
-      });
-    };
-
-    firebaseAuth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      timeout: Duration(seconds: 5),
-      verificationCompleted: verificationCompleted,
-      verificationFailed: verificationFailed,
-      codeSent: codeSent,
-      codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
-      
-    UI.showSpinnerOverlay(context);*/
   }
 
   @override
