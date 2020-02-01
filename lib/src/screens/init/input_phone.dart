@@ -75,8 +75,7 @@ class _InputPhonePageState extends State<InputPhonePage> {
           status = 'Something has gone wrong, please try later';
       });
     };
-    final PhoneVerificationCompleted verificationCompleted =
-    (AuthCredential auth) {
+    final PhoneVerificationCompleted verificationCompleted = (AuthCredential auth) {
       Navigator.pop(context);
       setState(() {
         status = 'Auto retrieving verification code';
@@ -109,95 +108,85 @@ class _InputPhonePageState extends State<InputPhonePage> {
       ),
       body: 
       SingleChildScrollView(
-        child: Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(height: 15),
-                  Text(
-                    'Confirm your country and enter your phone number(s)',
-                    textAlign: TextAlign.left,
-                    style: Theme.of(context).textTheme.body2,
-                  ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: 15),
+              Text(
+                'Confirm your country and enter your phone number(s)',
+                textAlign: TextAlign.left,
+                style: Theme.of(context).textTheme.body2,
+              ),
 
-                  CountryCodePicker(
-                    onChanged: onChangeCountry,
-                    initialSelection: mCode.code,
-                    favorite: ["US"],
-                    showFlag: true,
-                    showOnlyCountryWhenClosed: true,
-                    alignLeft: true,
-                    textStyle: Theme.of(context).textTheme.title
-                  ),
+              CountryCodePicker(
+                onChanged: onChangeCountry,
+                initialSelection: mCode.code,
+                favorite: ["US"],
+                showFlag: true,
+                showOnlyCountryWhenClosed: true,
+                alignLeft: true,
+                textStyle: Theme.of(context).textTheme.title
+              ),
 
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(color: Theme.of(context).hintColor.withOpacity(0.10), offset: Offset(0, 4), blurRadius: 10)
-                      ],
-                    ),
-                    child: Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: Text(
-                            mCode.dialCode,
-                            style: Theme.of(context).textTheme.title,
-                          )
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: TextField(
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'Enter your phone number',
-                              hintStyle: TextStyle(color: Theme.of(context).focusColor.withOpacity(0.8)),
-                              border: UnderlineInputBorder(borderSide: BorderSide.none),
-                              enabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
-                              focusedBorder: UnderlineInputBorder(borderSide: BorderSide.none),
-                            ),
-                            style: Theme.of(context).textTheme.title,
-                            onChanged: onPhoneNumberChanged,
-                          ),
-                        ),
-                      ]
-                    )
-                  ),
-
-                  Container(
-                    child: Text(
-                      status
-                    ),
-                  ),
-
-                  Container(
-                    alignment: Alignment.centerRight,
-                    child:FlatButton(
-                      onPressed: strPhoneNumber.isEmpty ? null : onSendSMSCode,
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(color: Theme.of(context).hintColor.withOpacity(0.10), offset: Offset(0, 4), blurRadius: 10)
+                  ],
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(10),
                       child: Text(
-                        'Send SMS Code',
-                        style: Theme.of(context).textTheme.button,
-                      ),
-                      color: Theme.of(context).accentColor,
-                      shape: StadiumBorder(),
+                        mCode.dialCode,
+                        style: Theme.of(context).textTheme.title,
+                      )
                     ),
+                    Expanded(
+                      flex: 1,
+                      child: TextField(
+                        keyboardType: TextInputType.number,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your phone number',
+                          hintStyle: TextStyle(color: Theme.of(context).focusColor.withOpacity(0.8)),
+                          border: UnderlineInputBorder(borderSide: BorderSide.none),
+                          enabledBorder: UnderlineInputBorder(borderSide: BorderSide.none),
+                          focusedBorder: UnderlineInputBorder(borderSide: BorderSide.none),
+                        ),
+                        style: Theme.of(context).textTheme.title,
+                        onChanged: onPhoneNumberChanged,
+                      ),
+                    ),
+                  ]
+                )
+              ),
+
+              Container(
+                child: Text(
+                  status
+                ),
+              ),
+
+              Container(
+                alignment: Alignment.centerRight,
+                child:FlatButton(
+                  onPressed: strPhoneNumber.isEmpty ? null : onSendSMSCode,
+                  child: Text(
+                    'Send SMS Code',
+                    style: Theme.of(context).textTheme.button,
                   ),
-                ]
-              )
-            ),
-            Padding(
-              padding: EdgeInsets.all(0),
-              child: Container(
-                color: Colors.red,
-              )
-            )
-          ]
-        )
+                  color: Theme.of(context).accentColor,
+                  shape: StadiumBorder(),
+                ),
+              ),
+            ]
+          )
+        ),
       )
     );
   }

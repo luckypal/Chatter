@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/route_generator.dart';
+import 'package:chatter/src/models/phone_verify.dart';
+import 'package:provider/provider.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(
+  MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PhoneVerifyState()),
+      ],
+      child: MyApp(),
+    ),
+  );
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
