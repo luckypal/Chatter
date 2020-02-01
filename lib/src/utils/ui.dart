@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class UI {
+  static bool isShowingSpinnerOverlay = false;
+
   static showSpinnerOverlay(BuildContext context) {
-    showGeneralDialog(
+    isShowingSpinnerOverlay = true;
+
+    showGeneralDialog<int>(
       context: context,
       barrierDismissible: false,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
@@ -28,7 +32,13 @@ class UI {
             )
           );
       },
-    );
+    ).then((int _) {
+      isShowingSpinnerOverlay = false;
+    });
+  }
+
+  static void closeSpinnerOverlay(BuildContext context) {
+    isShowingSpinnerOverlay && Navigator.pop(context);
   }
 
   static void showAlert(
@@ -51,6 +61,41 @@ class UI {
               onPressed: () {
                 Navigator.of(context).pop();
                 onPressed != null && onPressed();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  static void showConfirm(
+      BuildContext context,
+      {String title = "Chatter",
+      @required String content,
+      Function onResult}) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text(title),
+          content: new Text(content),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                onResult(true);
+              },
+            ),
+            new FlatButton(
+              child: new Text("No"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                onResult(false);
               },
             ),
           ],

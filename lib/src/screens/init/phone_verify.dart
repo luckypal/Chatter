@@ -8,16 +8,20 @@ import 'package:chatter/src/utils/ui.dart';
 import 'package:flutter/services.dart';
 import 'package:phone_number/phone_number.dart';
 import 'package:pin_entry_text_field/pin_entry_text_field.dart';
+import 'package:chatter/src/services/phone_verify.dart';
+import 'package:chatter/service_locator.dart';
 
 class PhoneInputArguments {
-  final String phoneNumber;
-  final CountryCode countryCode;
-  final String verificationId;
+  String phoneNumber;
+  CountryCode countryCode;
+  String verificationId;
+  Function beforeBack;
 
   PhoneInputArguments({
     @required this.phoneNumber,
     @required this.countryCode,
-    @required this.verificationId});
+    @required this.verificationId,
+    @required this.beforeBack});
 }
 
 class PhoneVerifyPage extends StatefulWidget {
@@ -30,8 +34,11 @@ class PhoneVerifyPage extends StatefulWidget {
 }
 
 class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
+  PhoneVerifyService phoneVerifyService;
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+
   String phoneNumber = "";
+
   PhoneNumber _phoneNumberPlugin = PhoneNumber();
   AuthCredential _authCredential;
 
@@ -39,6 +46,33 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
   void initState() {
     super.initState();
     initPlatformState();
+
+    phoneVerifyService = locator<PhoneVerifyService>();
+
+    phoneVerifyService.onVerificationCompleted = (AuthCredential auth) {};
+
+    phoneVerifyService.onVerificationFailed = (AuthException exception) {};
+
+    //Resent
+    phoneVerifyService.onCodeSent = (String phoneNumberWithCode, String verificationId, [int forceResendingToken]) {
+      UI.closeSpinnerOverlay(context);
+      widget.args.verificationId = verificationId;
+      UI.showAlert(context, content: "Verification code is resent.");
+    };
+
+    phoneVerifyService.onCodeAutoRetrievalTimeout = (String verificationId) {
+      //Resend verification Code again or pop
+      UI.showConfirm(context, content: "Verification code is timeout.\nDo you wanna resend code again?", onResult: (bool result) {
+        if (result) { //Yes
+          UI.showSpinnerOverlay(context);
+          phoneVerifyService.phoneVerify(widget.args.phoneNumber);
+        } else {  //No
+          widget.args.beforeBack();
+          UI.closeSpinnerOverlay(context);
+          Navigator.pop(context);
+        }
+      });
+    };
   }
 
   Future<void> initPlatformState() async {
@@ -50,20 +84,23 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
 
   void onVerifyCode(verifyCode) async {
     _authCredential = PhoneAuthProvider.getCredential(verificationId: widget.args.verificationId, smsCode: verifyCode);
-    UI.showSpinnerOverlay(context);
 
     try {
-      Navigator.pop(context);
+      UI.showSpinnerOverlay(context);
       AuthResult user = await firebaseAuth.signInWithCredential(_authCredential);
     } on PlatformException catch (error) {
-      Navigator.pop(context);
-      error.message;
+      // error.message;
     }
+    UI.closeSpinnerOverlay(context);
   }
 
-  void onResendCode() {}
+  void onResendCode() {
+    UI.showSpinnerOverlay(context);
+    phoneVerifyService.phoneVerify(widget.args.phoneNumber);
+  }
 
   void onChangePhoneNumber() {
+    widget.args.beforeBack();
     Navigator.pop(context);
   }
 
@@ -128,19 +165,6 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
                   style: Theme.of(context).textTheme.body2,
                 ),
               )
-
-              // Container(
-              //   alignment: Alignment.center,
-              //   child: FlatButton(
-              //     onPressed: verifyCode.isEmpty ? () {} : onVerifyCode,
-              //     child: Text(
-              //       'Verify',
-              //       style: Theme.of(context).textTheme.button,
-              //     ),
-              //     color: Theme.of(context).accentColor,
-              //     shape: StadiumBorder(),
-              //   ),
-              // ),
             ]
           )
         ),

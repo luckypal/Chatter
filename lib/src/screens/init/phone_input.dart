@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:flutter/services.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/utils/ui.dart';
+import 'package:chatter/src/services/phone_verify.dart';
+import 'package:chatter/service_locator.dart';
 
 class PhoneInputPage extends StatefulWidget {
   @override
@@ -13,7 +15,7 @@ class PhoneInputPage extends StatefulWidget {
 }
 
 class _PhoneInputPageState extends State<PhoneInputPage> {
-  final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  PhoneVerifyService phoneVerifyService;
   CountryCode mCode;
   String strPhoneNumber = "7865778328";
 
@@ -27,6 +29,23 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
       code: "US",
       dialCode: "+1"
     );
+
+    phoneVerifyService = locator<PhoneVerifyService>();
+    setServiceFunction();
+  }
+
+  void setServiceFunction() {
+    phoneVerifyService.onCodeSent = (String phoneNumberWithCode, String verificationId, [int forceResendingToken]) async {
+      UI.closeSpinnerOverlay(context);
+
+      this.verificationId = verificationId;
+      Navigator.pushNamed(context, "/PhoneVerify", arguments: new PhoneInputArguments(
+        verificationId: verificationId,
+        countryCode: mCode,
+        phoneNumber: phoneNumberWithCode,
+        beforeBack: setServiceFunction
+      ));
+    };
   }
 
   void onChangeCountry(CountryCode code) {
@@ -44,7 +63,10 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
   void onSendSMSCode() {
     String phoneNumber = mCode.dialCode + strPhoneNumber;
 
-    final PhoneCodeSent codeSent = (String verificationId, [int forceResendingToken]) async {
+    UI.showSpinnerOverlay(context);
+    phoneVerifyService.phoneVerify(phoneNumber);
+
+    /*final PhoneCodeSent codeSent = (String verificationId, [int forceResendingToken]) async {
       this.verificationId = verificationId;
       Navigator.pop(context);
       Navigator.pushNamed(context, "/PhoneVerify", arguments: new PhoneInputArguments(
@@ -97,7 +119,7 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
       codeSent: codeSent,
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
       
-    UI.showSpinnerOverlay(context);
+    UI.showSpinnerOverlay(context);*/
   }
 
   @override
