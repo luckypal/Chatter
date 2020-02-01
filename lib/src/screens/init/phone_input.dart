@@ -6,12 +6,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/utils/ui.dart';
 
-class InputPhonePage extends StatefulWidget {
+class PhoneInputPage extends StatefulWidget {
   @override
-  _InputPhonePageState createState() => _InputPhonePageState();
+  _PhoneInputPageState createState() => _PhoneInputPageState();
 }
 
-class _InputPhonePageState extends State<InputPhonePage> {
+class _PhoneInputPageState extends State<PhoneInputPage> {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   CountryCode mCode;
   String strPhoneNumber = "7865778328";
