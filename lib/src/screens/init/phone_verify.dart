@@ -51,7 +51,8 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
 
     phoneVerifyService.onVerificationCompleted = (AuthCredential auth) {};
 
-    phoneVerifyService.onVerificationFailed = (AuthException exception) {};
+    phoneVerifyService.onVerificationFailed = (AuthException exception) {
+    };
 
     //Resent
     phoneVerifyService.onCodeSent = (String phoneNumberWithCode, String verificationId, [int forceResendingToken]) {
@@ -88,10 +89,14 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
     try {
       UI.showSpinnerOverlay(context);
       AuthResult user = await firebaseAuth.signInWithCredential(_authCredential);
+      UI.closeSpinnerOverlay(context);
+      phoneVerifyService.isDone = true;
+      Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
     } on PlatformException catch (error) {
       // error.message;
+      UI.closeSpinnerOverlay(context);
+      UI.showAlert(context, content: error.message);
     }
-    UI.closeSpinnerOverlay(context);
   }
 
   void onResendCode() {

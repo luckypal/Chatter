@@ -195,11 +195,11 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
                 )
               ),
 
-              // Container(
-              //   child: Text(
-              //     status
-              //   ),
-              // ),
+              Container(
+                child: Text(
+                  status
+                ),
+              ),
 
               Container(
                 alignment: Alignment.centerRight,

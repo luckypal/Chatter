@@ -38,7 +38,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
 
   onContinue() {
     // Navigator.of(context).pushReplacementNamed('/InputPhone');
-    Navigator.of(context).pushNamed('/InputPhone');
+    Navigator.of(context).pushNamed('/PhoneInput');
   }
 
   isLastPage() {
