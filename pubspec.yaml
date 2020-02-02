@@ -36,6 +36,8 @@ dependencies:
   phone_number: ^0.6.0+1
   pin_code_fields: ^2.3.0+3
   get_it: ^3.1.0
+  image_picker: ^0.6.3+1
+  image_cropper: ^1.2.1
 
 dev_dependencies:
   flutter_test:
