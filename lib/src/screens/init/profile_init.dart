@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:chatter/service_locator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:flutter/services.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/utils/ui.dart';
+import 'package:chatter/src/services/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -18,11 +20,18 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
   File croppedImgFile;
   Image croppedImg;
 
+  UserService userService;
   String userName = "";
 
   @override
   void initState() {
     super.initState();
+    // userNameController = new TextEditingController(text: userName);
+    
+    userService = locator<UserService>();
+    if (userService.user != null) {
+      userName = userService.user.displayName;
+    }
   }
   
   Future getImage() async {
@@ -55,9 +64,18 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
     });
   }
 
-  void onDone() {
+  void onDone() async {
     if (_profileSettingsFormKey.currentState.validate()) {
+      UI.showSpinnerOverlay(context);
       //Save croppedImg and userName to server.
+
+      FirebaseUser user = await FirebaseAuth.instance.currentUser();
+      UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
+      userUpdateInfo.displayName = userName;
+      user.updateProfile(userUpdateInfo);
+
+      UI.closeSpinnerOverlay(context);
+      Navigator.pushReplacementNamed(context, "/Tabs", arguments: 2);
     }
   }
 
@@ -141,10 +159,11 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
                 child: Column(
                   children: <Widget>[
                     new TextFormField(
+                      // controller: userNameController,
                       style: TextStyle(color: Theme.of(context).hintColor),
                       keyboardType: TextInputType.text,
                       decoration: getInputDecoration(hintText: 'ChatterLover', labelText: 'User Name'),
-                      initialValue: "",
+                      initialValue: userName,
                       validator: (input) => input.trim().length < 3 ? 'Not a valid full name' : null,
                       onChanged: (input) => setState(() { userName = input; }),
                     ),

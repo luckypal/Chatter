@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:phone_number/phone_number.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:chatter/src/services/phone_verify.dart';
+import 'package:chatter/src/services/user.dart';
 import 'package:chatter/service_locator.dart';
 
 class PhoneInputArguments {
@@ -91,9 +92,13 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
     try {
       UI.showSpinnerOverlay(context);
       AuthResult user = await firebaseAuth.signInWithCredential(_authCredential);
-      UI.closeSpinnerOverlay(context);
       phoneVerifyService.isDone = true;
-      Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
+      
+      UserService userService = locator<UserService>();
+      userService.load().then((FirebaseUser _) {
+        UI.closeSpinnerOverlay(context);
+        Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
+      });
     } on PlatformException catch (error) {
       // error.message;
       UI.closeSpinnerOverlay(context);

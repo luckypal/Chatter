@@ -1,3 +1,4 @@
+import 'package:chatter/src/screens/tabs/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/src/screens/init/on_boarding.dart';
 import 'package:chatter/src/screens/init/phone_input.dart';
@@ -18,6 +19,9 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => PhoneVerifyPage(args: args));
       case '/ProfileInit':
         return MaterialPageRoute(builder: (_) => ProfileInitPage());
+      
+      case '/Tabs':
+        return MaterialPageRoute(builder: (_) => TabsWidget(currentTab: args));
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();

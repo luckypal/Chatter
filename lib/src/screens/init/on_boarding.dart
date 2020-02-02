@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/phone_verify.dart';
+import 'package:chatter/src/services/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,10 +24,13 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     slider = getSlider();
     super.initState();
     
-    PhoneVerifyService phoneVerifyService = locator<PhoneVerifyService>();
-    phoneVerifyService.getCurrentUser().then((FirebaseUser user) {
-      if (user != null) {
-        Navigator.pushReplacementNamed(context, "/ProfileInit");
+    UserService userService = locator<UserService>();
+    userService.load().then((FirebaseUser user) {
+      if (userService.user != null) {
+        if (userService.user.displayName == null)
+          Navigator.pushReplacementNamed(context, "/ProfileInit");
+        else
+          Navigator.pushReplacementNamed(context, "/Tabs", arguments: 2);
       }
     });
   }
