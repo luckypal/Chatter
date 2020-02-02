@@ -24,7 +24,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     slider = getSlider();
     super.initState();
     
-    UserService userService = locator<UserService>();
+    /*UserService userService = locator<UserService>();
     userService.load().then((FirebaseUser user) {
       if (userService.user != null) {
         if (userService.user.displayName == null)
@@ -32,7 +32,7 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
         else
           Navigator.pushReplacementNamed(context, "/Tabs", arguments: 2);
       }
-    });
+    });*/
   }
 
   onSkip() {

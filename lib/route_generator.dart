@@ -21,7 +21,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => ProfileInitPage());
       
       case '/Tabs':
-        return MaterialPageRoute(builder: (_) => TabsWidget(currentTab: args));
+        return MaterialPageRoute(builder: (_) => TabsWidget(currentTab: args != null ? args : 2));
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();

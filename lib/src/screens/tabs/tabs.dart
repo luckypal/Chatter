@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatter/config/ui_icons.dart';
 // import 'package:chatter/src/screens/account.dart';
 // import 'package:chatter/src/screens/chat.dart';
@@ -79,98 +81,104 @@ class _TabsWidgetState extends State<TabsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      // drawer: DrawerWidget(),
-      // endDrawer: FilterWidget(),
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-//        leading: new IconButton(
-//          icon: new Icon(UiIcons.return_icon, color: Theme.of(context).hintColor),
-//          onPressed: () => Navigator.of(context).pop(),
-//        ),
-        leading: new IconButton(
-          icon: new Icon(Icons.sort, color: Theme.of(context).hintColor),
-          onPressed: () => _scaffoldKey.currentState.openDrawer(),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          widget.currentTitle,
-          style: Theme.of(context).textTheme.display1,
-        ),
-        // actions: <Widget>[
-        //   new ShoppingCartButtonWidget(
-        //       iconColor: Theme.of(context).hintColor, labelColor: Theme.of(context).accentColor),
-        //   Container(
-        //       width: 30,
-        //       height: 30,
-        //       margin: EdgeInsets.only(top: 12.5, bottom: 12.5, right: 20),
-        //       child: InkWell(
-        //         borderRadius: BorderRadius.circular(300),
-        //         onTap: () {
-        //           Navigator.of(context).pushNamed('/Tabs', arguments: 1);
-        //         },
-        //         child: CircleAvatar(
-        //           backgroundImage: AssetImage('img/user2.jpg'),
-        //         ),
-        //       )),
-        // ],
-      ),
-      body: widget.currentPage,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Theme.of(context).accentColor,
-        selectedFontSize: 0,
-        unselectedFontSize: 0,
-        iconSize: 22,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        selectedIconTheme: IconThemeData(size: 25),
-        unselectedItemColor: Theme.of(context).hintColor.withOpacity(1),
-        currentIndex: widget.selectedTab,
-        onTap: (int i) {
-          this._selectTab(i);
-        },
-        // this will be set when a new tab is tapped
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(UiIcons.bell),
-            title: new Container(height: 0.0),
+    return WillPopScope(
+      onWillPop: () {
+        exit(0);
+        return new Future(() => true);
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        // drawer: DrawerWidget(),
+        // endDrawer: FilterWidget(),
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+  //        leading: new IconButton(
+  //          icon: new Icon(UiIcons.return_icon, color: Theme.of(context).hintColor),
+  //          onPressed: () => Navigator.of(context).pop(),
+  //        ),
+          leading: new IconButton(
+            icon: new Icon(Icons.sort, color: Theme.of(context).hintColor),
+            onPressed: () => _scaffoldKey.currentState.openDrawer(),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(UiIcons.user_1),
-            title: new Container(height: 0.0),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          title: Text(
+            widget.currentTitle,
+            style: Theme.of(context).textTheme.display1,
           ),
-          BottomNavigationBarItem(
-              title: new Container(height: 5.0),
-              icon: Container(
-                width: 45,
-                height: 45,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).accentColor,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(50),
+          // actions: <Widget>[
+          //   new ShoppingCartButtonWidget(
+          //       iconColor: Theme.of(context).hintColor, labelColor: Theme.of(context).accentColor),
+          //   Container(
+          //       width: 30,
+          //       height: 30,
+          //       margin: EdgeInsets.only(top: 12.5, bottom: 12.5, right: 20),
+          //       child: InkWell(
+          //         borderRadius: BorderRadius.circular(300),
+          //         onTap: () {
+          //           Navigator.of(context).pushNamed('/Tabs', arguments: 1);
+          //         },
+          //         child: CircleAvatar(
+          //           backgroundImage: AssetImage('img/user2.jpg'),
+          //         ),
+          //       )),
+          // ],
+        ),
+        body: widget.currentPage,
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Theme.of(context).accentColor,
+          selectedFontSize: 0,
+          unselectedFontSize: 0,
+          iconSize: 22,
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          selectedIconTheme: IconThemeData(size: 25),
+          unselectedItemColor: Theme.of(context).hintColor.withOpacity(1),
+          currentIndex: widget.selectedTab,
+          onTap: (int i) {
+            this._selectTab(i);
+          },
+          // this will be set when a new tab is tapped
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(UiIcons.bell),
+              title: new Container(height: 0.0),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(UiIcons.user_1),
+              title: new Container(height: 0.0),
+            ),
+            BottomNavigationBarItem(
+                title: new Container(height: 5.0),
+                icon: Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(50),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Theme.of(context).accentColor.withOpacity(0.4), blurRadius: 40, offset: Offset(0, 15)),
+                      BoxShadow(
+                          color: Theme.of(context).accentColor.withOpacity(0.4), blurRadius: 13, offset: Offset(0, 3))
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Theme.of(context).accentColor.withOpacity(0.4), blurRadius: 40, offset: Offset(0, 15)),
-                    BoxShadow(
-                        color: Theme.of(context).accentColor.withOpacity(0.4), blurRadius: 13, offset: Offset(0, 3))
-                  ],
-                ),
-                child: new Icon(UiIcons.home, color: Theme.of(context).primaryColor),
-              )),
-          BottomNavigationBarItem(
-            icon: new Icon(UiIcons.chat),
-            title: new Container(height: 0.0),
-          ),
-          BottomNavigationBarItem(
-            icon: new Icon(UiIcons.heart),
-            title: new Container(height: 0.0),
-          ),
-        ],
-      ),
+                  child: new Icon(UiIcons.home, color: Theme.of(context).primaryColor),
+                )),
+            BottomNavigationBarItem(
+              icon: new Icon(UiIcons.chat),
+              title: new Container(height: 0.0),
+            ),
+            BottomNavigationBarItem(
+              icon: new Icon(UiIcons.heart),
+              title: new Container(height: 0.0),
+            ),
+          ],
+        ),
+      )
     );
   }
 }
