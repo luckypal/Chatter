@@ -65,3 +65,7 @@ class Colors {
     return this._accentDarkColor.withOpacity(opacity);
   }
 }
+
+class Server {
+  static const String SERVER_URL = "http://192.168.207.171:5000";
+}

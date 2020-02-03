@@ -55,8 +55,7 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
 
     phoneVerifyService.onVerificationCompleted = (AuthCredential auth) {};
 
-    phoneVerifyService.onVerificationFailed = (AuthException exception) {
-    };
+    phoneVerifyService.onVerificationFailed = (AuthException exception) {};
 
     //Resent
     phoneVerifyService.onCodeSent = (String phoneNumberWithCode, String verificationId, [int forceResendingToken]) {

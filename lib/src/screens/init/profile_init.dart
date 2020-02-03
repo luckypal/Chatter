@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/services/server.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +22,7 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
   Image croppedImg;
 
   UserService userService;
+  ServerService serverService;
   String userName = "";
 
   @override
@@ -32,6 +34,8 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
     if (userService.user != null) {
       userName = userService.user.displayName;
     }
+
+    serverService = locator<ServerService>();
   }
   
   Future getImage() async {
@@ -68,11 +72,21 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
     if (_profileSettingsFormKey.currentState.validate()) {
       UI.showSpinnerOverlay(context);
       //Save croppedImg and userName to server.
+      String phoneNumber = userService.user.phoneNumber;
+      Map<String, dynamic> uploadResult = await serverService.uploadProfileImage(phoneNumber, userName, croppedImgFile);
+
+      if (!uploadResult ["result"]) {
+        UI.closeSpinnerOverlay(context);
+        return;
+      }
+
+      String photoUrl = uploadResult ["data"]["imageUrl"];
 
       FirebaseUser user = await FirebaseAuth.instance.currentUser();
       UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
       userUpdateInfo.displayName = userName;
-      user.updateProfile(userUpdateInfo);
+      userUpdateInfo.photoUrl = photoUrl;
+      await user.updateProfile(userUpdateInfo);
 
       UI.closeSpinnerOverlay(context);
       Navigator.pushReplacementNamed(context, "/Tabs", arguments: 2);

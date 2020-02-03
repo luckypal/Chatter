@@ -13,6 +13,10 @@ void main() async {
   setupServiceLocator();
   UserService userService = locator<UserService>();
   await userService.load();
+  
+  // UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
+  // userUpdateInfo.displayName = null;
+  // await userService.user.updateProfile(userUpdateInfo);
 
   runApp(
     MultiProvider(
