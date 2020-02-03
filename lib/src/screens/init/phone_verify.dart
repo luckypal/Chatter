@@ -96,7 +96,10 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
       UserService userService = locator<UserService>();
       userService.load().then((FirebaseUser _) {
         UI.closeSpinnerOverlay(context);
-        Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
+        if (userService.user.displayName == null || userService.user.displayName.isEmpty)
+          Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
+        else
+          Navigator.pushNamedAndRemoveUntil(context, "/Tabs", ModalRoute.withName("/"), arguments: 2);
       });
     } on PlatformException catch (error) {
       // error.message;

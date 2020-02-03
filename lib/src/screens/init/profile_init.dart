@@ -86,6 +86,9 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
       UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
       userUpdateInfo.displayName = userName;
       userUpdateInfo.photoUrl = photoUrl;
+
+      await userService.saveToDatabase(userUpdateInfo);
+
       await user.updateProfile(userUpdateInfo);
 
       UI.closeSpinnerOverlay(context);

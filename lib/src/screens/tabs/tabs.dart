@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chatter/config/ui_icons.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:chatter/src/screens/account.dart';
 // import 'package:chatter/src/screens/chat.dart';
 // import 'package:chatter/src/screens/favorites.dart';
@@ -37,6 +38,16 @@ class _TabsWidgetState extends State<TabsWidget> {
   initState() {
     _selectTab(widget.currentTab);
     super.initState();
+
+    // Firestore firestore = Firestore.instance;
+    // firestore.collection('users').where("phoneNumber", isEqualTo: "+17865778328").snapshots().listen((data) {
+    //   print("Update");
+    //   data.documents.forEach((doc) {
+    //     print("AAAAAA");
+    //     print(doc.documentID);
+    //     print(doc.data);
+    //   });
+    // });
   }
 
   @override
