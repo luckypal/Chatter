@@ -44,6 +44,11 @@ dependencies:
   image_cropper: ^1.2.1
   mime: ^0.9.6+3
 
+  share: ^0.6.3+5
+  sprintf: ^4.0.2
+  permission_handler: '^4.2.0+hotfix.3'
+  contacts_service: ^0.3.10
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

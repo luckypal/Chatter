@@ -1,6 +1,10 @@
+import 'package:chatter/config/text.dart';
+import 'package:chatter/src/utils/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/config/ui_icons.dart';
+import 'package:share/share.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatContactsWidget extends StatefulWidget {
   @override
@@ -9,10 +13,30 @@ class ChatContactsWidget extends StatefulWidget {
 
 class _ChatContactsWidgetState extends State<ChatContactsWidget>
     with SingleTickerProviderStateMixin {
-  config.App app;
   @override
   void initState() {
     super.initState();
+  }
+
+  onInviteFriend() {
+    Share.share(UIText.invitationMsg, subject: 'Invite to ${UIText.appName}');
+  }
+
+  onAllowAccessToContacts() async {
+    PermissionGroup permission = PermissionGroup.contacts;
+
+    PermissionStatus status = await PermissionHandler().checkPermissionStatus(permission);
+    if (status == PermissionStatus.granted) {
+      UI.showAlert(context, content: "You are already allowed to access contacts.");
+      return;
+    }
+
+    Map<PermissionGroup, PermissionStatus> permissions =
+        await PermissionHandler()
+            .requestPermissions([permission]);
+    if (permissions [permission] == PermissionStatus.granted) {
+      UI.showAlert(context, content: "Allowed to access contacts.");
+    }
   }
 
   Widget createActionButton({IconData icon, String text, Function onPressed}) {
@@ -96,27 +120,28 @@ class _ChatContactsWidgetState extends State<ChatContactsWidget>
                 return createActionButton(
                     icon: Icons.add,
                     text: "Invite a Friend to Chatter",
-                    onPressed: () {});
+                    onPressed: onInviteFriend);
               else
                 return createActionButton(
                     icon: UiIcons.users,
                     text: "Allow Access to Contacts (Phone)",
-                    onPressed: () {});
+                    onPressed: onAllowAccessToContacts);
             },
           ),
           Container(
             alignment: Alignment.center,
+            padding: EdgeInsets.only(top: 10),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Text(
-                  'Social Media Friends and Followers can\nbe invited when you set your preferences\nand allow ${config.App.appName} to Access your accounts.   ',
+                  'Social Media Friends and Followers can\nbe invited when you set your preferences\nand allow ${UIText.appName} to Access your accounts.   ',
                   style: Theme.of(context).textTheme.body1,
                   textAlign: TextAlign.left,
                 ),
                 SizedBox(height: 5),
                 Text(
-                  'This is for your convenience only.\nYour contacts will not be solicited by ${config.App.appName}.',
+                  'This is for your convenience only.\nYour contacts will not be solicited by ${UIText.appName}.',
                   style: Theme.of(context).textTheme.body1,
                   textAlign: TextAlign.left,
                 ),

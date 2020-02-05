@@ -1,3 +1,4 @@
+import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/user.dart';
@@ -211,7 +212,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
           ListTile(
             dense: true,
             title: Text(
-              "Version " + config.App.appVersion,
+              'Version ${UIText.appVersion}',
               style: Theme.of(context).textTheme.body1,
             ),
             trailing: Icon(
