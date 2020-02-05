@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class App {
+  static final String appName = "Chatter";
+  static final String appVersion = "0.0.1";
+
   BuildContext _context;
   double _height;
   double _width;

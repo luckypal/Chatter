@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:chatter/config/ui_icons.dart';
+import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/services/user.dart';
+import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:chatter/src/screens/account.dart';
+import 'package:chatter/src/screens/chat/contacts.dart';
 // import 'package:chatter/src/screens/chat.dart';
 // import 'package:chatter/src/screens/favorites.dart';
 // import 'package:chatter/src/screens/home.dart';
@@ -34,10 +37,14 @@ class TabsWidget extends StatefulWidget {
 
 class _TabsWidgetState extends State<TabsWidget> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  UserService userService;
+  
   @override
   initState() {
     _selectTab(widget.currentTab);
     super.initState();
+    
+    userService = locator<UserService>();
 
     // Firestore firestore = Firestore.instance;
     // firestore.collection('users').where("phoneNumber", isEqualTo: "+17865778328").snapshots().listen((data) {
@@ -62,7 +69,7 @@ class _TabsWidgetState extends State<TabsWidget> {
       widget.selectedTab = tabItem;
       switch (tabItem) {
         case 0:
-          widget.currentTitle = 'Preferences';
+          widget.currentTitle = 'Contacts';
           widget.currentPage = HomeWidget();
           break;
         case 1:
@@ -70,15 +77,15 @@ class _TabsWidgetState extends State<TabsWidget> {
           widget.currentPage = HomeWidget();
           break;
         case 2:
-          widget.currentTitle = 'Contacts';
-          widget.currentPage = HomeWidget();
+          widget.currentTitle = 'Chats & Messages';
+          widget.currentPage = ChatContactsWidget();
           break;
         case 3:
           widget.currentTitle = 'Notifications';
           widget.currentPage = HomeWidget();
           break;
         case 4:
-          widget.currentTitle = 'Emojis';
+          widget.currentTitle = 'Preferences';
           widget.currentPage = HomeWidget();
           break;
         // case 5:
@@ -99,7 +106,7 @@ class _TabsWidgetState extends State<TabsWidget> {
       },
       child: Scaffold(
         key: _scaffoldKey,
-        // drawer: DrawerWidget(),
+        drawer: DrawerWidget(),
         // endDrawer: FilterWidget(),
         appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -117,23 +124,23 @@ class _TabsWidgetState extends State<TabsWidget> {
             widget.currentTitle,
             style: Theme.of(context).textTheme.display1,
           ),
-          // actions: <Widget>[
-          //   new ShoppingCartButtonWidget(
-          //       iconColor: Theme.of(context).hintColor, labelColor: Theme.of(context).accentColor),
-          //   Container(
-          //       width: 30,
-          //       height: 30,
-          //       margin: EdgeInsets.only(top: 12.5, bottom: 12.5, right: 20),
-          //       child: InkWell(
-          //         borderRadius: BorderRadius.circular(300),
-          //         onTap: () {
-          //           Navigator.of(context).pushNamed('/Tabs', arguments: 1);
-          //         },
-          //         child: CircleAvatar(
-          //           backgroundImage: AssetImage('img/user2.jpg'),
-          //         ),
-          //       )),
-          // ],
+          actions: <Widget>[
+            // new ShoppingCartButtonWidget(
+            //     iconColor: Theme.of(context).hintColor, labelColor: Theme.of(context).accentColor),
+            Container(
+                width: 30,
+                height: 30,
+                margin: EdgeInsets.only(top: 12.5, bottom: 12.5, right: 20),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(300),
+                  onTap: () {
+                    Navigator.of(context).pushNamed('/Tabs', arguments: 1);
+                  },
+                  child: CircleAvatar(
+                    backgroundImage: Image.network(userService.user.photoUrl).image,
+                  ),
+                )),
+          ],
         ),
         body: widget.currentPage,
         bottomNavigationBar: BottomNavigationBar(
@@ -153,7 +160,7 @@ class _TabsWidgetState extends State<TabsWidget> {
           // this will be set when a new tab is tapped
           items: [
             BottomNavigationBarItem(
-              icon: Icon(UiIcons.settings),
+              icon: Icon(UiIcons.users),
               title: new Container(height: 0.0),
             ),
             BottomNavigationBarItem(
@@ -184,7 +191,7 @@ class _TabsWidgetState extends State<TabsWidget> {
               title: new Container(height: 0.0),
             ),
             BottomNavigationBarItem(
-              icon: new Icon(UiIcons.shopping_cart),
+              icon: new Icon(UiIcons.settings),
               title: new Container(height: 0.0),
             ),
           ],
