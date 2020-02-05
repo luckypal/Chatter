@@ -23,17 +23,19 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
 
   UserService userService;
   ServerService serverService;
+
+  TextEditingController userNameController;
   String userName = "";
 
   @override
   void initState() {
     super.initState();
-    // userNameController = new TextEditingController(text: userName);
     
     userService = locator<UserService>();
-    if (userService.user != null) {
+    if (userService.user != null && userService.user.displayName != null) {
       userName = userService.user.displayName;
     }
+    userNameController = TextEditingController(text: userName);
 
     serverService = locator<ServerService>();
   }
@@ -60,11 +62,12 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
         minimumAspectRatio: 1.0,
       )
     );
-
+  
     if (croppedImgFile == null) return;
 
     setState(() {
       croppedImg = Image.file(croppedImgFile);
+      userNameController.text = userName;
     });
   }
 
@@ -176,13 +179,13 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
                 child: Column(
                   children: <Widget>[
                     new TextFormField(
-                      // controller: userNameController,
+                      controller: userNameController,
                       style: TextStyle(color: Theme.of(context).hintColor),
                       keyboardType: TextInputType.text,
                       decoration: getInputDecoration(hintText: 'ChatterLover', labelText: 'User Name'),
-                      initialValue: userName,
+                      // initialValue: userName,
                       validator: (input) => input.trim().length < 3 ? 'Not a valid full name' : null,
-                      onChanged: (input) => setState(() { userName = input; }),
+                      onChanged: (input) => setState(() { userName = input.isEmpty ? userName : input; }),
                     ),
                   ]
                 ),
