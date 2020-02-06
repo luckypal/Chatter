@@ -42,6 +42,7 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
   
   Future getImage() async {
     var orgImageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (orgImageFile == null) return;
 
     croppedImgFile = await ImageCropper.cropImage(
       sourcePath: orgImageFile.path,
@@ -91,8 +92,8 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
       userUpdateInfo.photoUrl = photoUrl;
 
       await userService.saveToDatabase(userUpdateInfo);
-
       await user.updateProfile(userUpdateInfo);
+      await userService.load();
 
       UI.closeSpinnerOverlay(context);
       Navigator.pushReplacementNamed(context, "/Tabs", arguments: 2);

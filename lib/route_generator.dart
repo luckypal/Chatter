@@ -1,5 +1,6 @@
 import 'package:chatter/src/screens/tabs/tabs.dart';
 import 'package:flutter/material.dart';
+import 'package:chatter/src/screens/init/splash.dart';
 import 'package:chatter/src/screens/init/on_boarding.dart';
 import 'package:chatter/src/screens/init/phone_input.dart';
 import 'package:chatter/src/screens/init/phone_verify.dart';
@@ -12,6 +13,8 @@ class RouteGenerator {
 
     switch (settings.name) {
       case '/':
+        return MaterialPageRoute(builder: (_) => SplashPage());
+      case '/OnBoarding':
         return MaterialPageRoute(builder: (_) => OnBoardingPage());
       case '/PhoneInput':
         return MaterialPageRoute(builder: (_) => PhoneInputPage());

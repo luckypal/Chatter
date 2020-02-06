@@ -1,5 +1,4 @@
 import 'package:chatter/src/models/phone_verify.dart';
-import 'package:chatter/src/services/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
@@ -11,39 +10,25 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   setupServiceLocator();
-  UserService userService = locator<UserService>();
-  await userService.load();
-  
-  // UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
-  // userUpdateInfo.displayName = null;
-  // await userService.user.updateProfile(userUpdateInfo);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => PhoneVerifyState()),
       ],
-      child: MyApp(user: userService.user),
+      child: MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final FirebaseUser user;
-  MyApp({ this.user }) : super();
-  // This widget is the root of your application.
-
-  String getInitRoute() {
-    if (user == null) return "/";
-    if (user.displayName == null || user.displayName.isEmpty) return "/ProfileInit";
-    return "/Tabs";
-  }
+  MyApp() : super();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chatter',
-      initialRoute: getInitRoute(),
+      initialRoute: "/",
       onGenerateRoute: RouteGenerator.generateRoute,
       debugShowCheckedModeBanner: false,
       darkTheme: ThemeData(

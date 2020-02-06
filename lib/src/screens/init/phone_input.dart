@@ -27,7 +27,8 @@ class _PhoneInputPageState extends State<PhoneInputPage> {
     super.initState();
     mCode = new CountryCode(
       code: "US",
-      dialCode: "+1"
+      dialCode: "+1",
+      name: "United States"
     );
 
     phoneVerifyService = locator<PhoneVerifyService>();

@@ -3,6 +3,7 @@ import 'package:chatter/src/utils/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/config/ui_icons.dart';
+import 'package:chatter/src/widgets/searchbarwidget.dart';
 import 'package:share/share.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -13,9 +14,25 @@ class ChatContactsWidget extends StatefulWidget {
 
 class _ChatContactsWidgetState extends State<ChatContactsWidget>
     with SingleTickerProviderStateMixin {
+  bool isAccessContacts = false;
+
+  bool isHasContacts = true;
+
   @override
   void initState() {
     super.initState();
+
+    checkPermission();
+  }
+
+  void checkPermission() async {
+    PermissionStatus status = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.contacts);
+    if (status == PermissionStatus.granted) {
+      setState(() {
+        isAccessContacts = true;
+      });
+    }
   }
 
   onInviteFriend() {
@@ -25,17 +42,13 @@ class _ChatContactsWidgetState extends State<ChatContactsWidget>
   onAllowAccessToContacts() async {
     PermissionGroup permission = PermissionGroup.contacts;
 
-    PermissionStatus status = await PermissionHandler().checkPermissionStatus(permission);
-    if (status == PermissionStatus.granted) {
-      UI.showAlert(context, content: "You are already allowed to access contacts.");
-      return;
-    }
-
     Map<PermissionGroup, PermissionStatus> permissions =
-        await PermissionHandler()
-            .requestPermissions([permission]);
-    if (permissions [permission] == PermissionStatus.granted) {
+        await PermissionHandler().requestPermissions([permission]);
+    if (permissions[permission] == PermissionStatus.granted) {
       UI.showAlert(context, content: "Allowed to access contacts.");
+      setState(() {
+        isAccessContacts = true;
+      });
     }
   }
 
@@ -75,22 +88,17 @@ class _ChatContactsWidgetState extends State<ChatContactsWidget>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    dynamic app = config.App(context);
-
-    // double penIconSize = app.appWidth(15.0);
-
+  Widget blankContacts() {
     return Container(
-      width: app.appWidth(100.0),
+      width: config.App(context).appWidth(100.0),
       child: Column(
         children: <Widget>[
           Expanded(child: Container()),
           SizedBox(
-            width: 70,
-            height: 70,
+            width: 80,
+            height: 80,
             child: IconButton(
-              icon: new Icon(Icons.edit,
+              icon: new Icon(Icons.message,
                   color: Theme.of(context).accentColor, size: 50),
               onPressed: () => {},
             ),
@@ -124,8 +132,11 @@ class _ChatContactsWidgetState extends State<ChatContactsWidget>
               else
                 return createActionButton(
                     icon: UiIcons.users,
-                    text: "Allow Access to Contacts (Phone)",
-                    onPressed: onAllowAccessToContacts);
+                    text: isAccessContacts
+                        ? "Got Access to Contacts"
+                        : "Allow Access to Contacts (Phone)",
+                    onPressed:
+                        isAccessContacts ? null : onAllowAccessToContacts);
             },
           ),
           Container(
@@ -152,5 +163,59 @@ class _ChatContactsWidgetState extends State<ChatContactsWidget>
         ],
       ),
     );
+  }
+
+  Widget contactsList() {
+    return Stack(
+      children: <Widget>[
+        SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: 7),
+          child: Column(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: SearchBarWidget(),
+              ),
+              /*Offstage(
+                offstage: _conversationList.conversations.isEmpty,
+                child: ListView.separated(
+                  padding: EdgeInsets.symmetric(vertical: 15),
+                  shrinkWrap: true,
+                  primary: false,
+                  itemCount: _conversationList.conversations.length,
+                  separatorBuilder: (context, index) {
+                    return SizedBox(height: 7);
+                  },
+                  itemBuilder: (context, index) {
+                    return MessageItemWidget(
+                      message: _conversationList.conversations.elementAt(index),
+                      onDismissed: (conversation) {
+                        setState(() {
+                          _conversationList.conversations.removeAt(index);
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+              Offstage(
+                offstage: _conversationList.conversations.isNotEmpty,
+                child: EmptyMessagesWidget(),
+              )*/
+            ],
+          ),
+        ),
+        Container(
+          width: config.App(context).appWidth(100.0),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // double penIconSize = app.appWidth(15.0);
+
+    return isHasContacts ? contactsList() : blankContacts();
   }
 }

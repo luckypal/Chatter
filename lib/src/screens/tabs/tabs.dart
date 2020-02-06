@@ -143,6 +143,11 @@ class _TabsWidgetState extends State<TabsWidget> {
           ],
         ),
         body: widget.currentPage,
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          tooltip: 'Message',
+          child: Icon(Icons.message),
+        ),
         bottomNavigationBar: BottomNavigationBar(
           type: BottomNavigationBarType.fixed,
           selectedItemColor: Theme.of(context).accentColor,

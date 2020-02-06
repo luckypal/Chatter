@@ -90,17 +90,19 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
 
     try {
       UI.showSpinnerOverlay(context);
-      AuthResult user = await firebaseAuth.signInWithCredential(_authCredential);
+      await firebaseAuth.signInWithCredential(_authCredential);
       phoneVerifyService.isDone = true;
       
       UserService userService = locator<UserService>();
-      userService.load().then((FirebaseUser _) {
-        UI.closeSpinnerOverlay(context);
-        if (userService.user.displayName == null || userService.user.displayName.isEmpty)
-          Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
-        else
-          Navigator.pushNamedAndRemoveUntil(context, "/Tabs", ModalRoute.withName("/"), arguments: 2);
-      });
+      FirebaseUser user = await userService.load(isStrict: false);
+      
+      UI.closeSpinnerOverlay(context);
+      userService.countryCode = widget.args.countryCode;
+      
+      if (user == null || user.displayName == null || user.displayName.isEmpty) {
+        Navigator.pushNamedAndRemoveUntil(context, "/ProfileInit", ModalRoute.withName("/"));
+      } else
+        Navigator.pushNamedAndRemoveUntil(context, "/Tabs", ModalRoute.withName("/"), arguments: 2);
     } on PlatformException catch (error) {
       // error.message;
       UI.closeSpinnerOverlay(context);
