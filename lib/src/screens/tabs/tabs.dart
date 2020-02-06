@@ -5,7 +5,7 @@ import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/user.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:chatter/src/screens/chat/contacts.dart';
+import 'package:chatter/src/screens/chat/conversations.dart';
 // import 'package:chatter/src/screens/chat.dart';
 // import 'package:chatter/src/screens/favorites.dart';
 // import 'package:chatter/src/screens/home.dart';
@@ -78,7 +78,7 @@ class _TabsWidgetState extends State<TabsWidget> {
           break;
         case 2:
           widget.currentTitle = 'Chats & Messages';
-          widget.currentPage = ChatContactsWidget();
+          widget.currentPage = ConversationsWidget();
           break;
         case 3:
           widget.currentTitle = 'Notifications';

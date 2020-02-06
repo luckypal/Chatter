@@ -7,12 +7,12 @@ import 'package:chatter/src/widgets/searchbarwidget.dart';
 import 'package:share/share.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class ChatContactsWidget extends StatefulWidget {
+class ConversationsWidget extends StatefulWidget {
   @override
-  _ChatContactsWidgetState createState() => _ChatContactsWidgetState();
+  _ConversationsWidgetState createState() => _ConversationsWidgetState();
 }
 
-class _ChatContactsWidgetState extends State<ChatContactsWidget>
+class _ConversationsWidgetState extends State<ConversationsWidget>
     with SingleTickerProviderStateMixin {
   bool isAccessContacts = false;
 
