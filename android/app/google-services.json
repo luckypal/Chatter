@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "528431922543-jb1s431hb0c8htuh3m7fqnnomt5pl771.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.luke.chatter",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
           "client_id": "528431922543-r2rl6l7nu139r2nqkagn6h6fl6gpftr9.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

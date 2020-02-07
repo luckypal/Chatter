@@ -97,6 +97,10 @@ class _TabsWidgetState extends State<TabsWidget> {
     });
   }
 
+  void onShowContacts() {
+    Navigator.pushNamed(context, "/Contacts");
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -144,7 +148,7 @@ class _TabsWidgetState extends State<TabsWidget> {
         ),
         body: widget.currentPage,
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: onShowContacts,
           tooltip: 'Message',
           child: Icon(Icons.message),
         ),

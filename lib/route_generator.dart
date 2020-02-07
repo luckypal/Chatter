@@ -1,10 +1,11 @@
-import 'package:chatter/src/screens/tabs/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/src/screens/init/splash.dart';
 import 'package:chatter/src/screens/init/on_boarding.dart';
 import 'package:chatter/src/screens/init/phone_input.dart';
 import 'package:chatter/src/screens/init/phone_verify.dart';
 import 'package:chatter/src/screens/init/profile_init.dart';
+import 'package:chatter/src/screens/tabs/tabs.dart';
+import 'package:chatter/src/screens/chat/contacts.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -25,6 +26,9 @@ class RouteGenerator {
       
       case '/Tabs':
         return MaterialPageRoute(builder: (_) => TabsWidget(currentTab: args != null ? args : 2));
+
+      case '/Contacts':
+        return MaterialPageRoute(builder: (_) => ContactsPage());
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();

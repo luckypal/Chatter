@@ -78,6 +78,10 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
       //Save croppedImg and userName to server.
       String phoneNumber = userService.user.phoneNumber;
       Map<String, dynamic> uploadResult = await serverService.uploadProfileImage(phoneNumber, userName, croppedImgFile);
+      if (uploadResult == null) {
+        UI.closeSpinnerOverlay(context);
+        return;
+      }
 
       if (!uploadResult ["result"]) {
         UI.closeSpinnerOverlay(context);
