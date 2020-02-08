@@ -21,6 +21,7 @@ abstract class UserService {
 
   Future<FirebaseUser> load({bool isStrict = true});
   Future<void> saveToDatabase(UserUpdateInfo userUpdateInfo);
+  Future<List<ChatterUserModel>> findUsers({List<String> phoneNumbers});
 }
 
 class UserServiceImpl extends UserService {
@@ -78,6 +79,22 @@ class UserServiceImpl extends UserService {
           "name": countryCode.name //ex: United States
         }
       });
+    });
+  }
+
+  @override
+  Future<List<ChatterUserModel>> findUsers({List<String> phoneNumbers}) {
+    return new Future<List<ChatterUserModel>>(() async {
+      List<ChatterUserModel> users = new List<ChatterUserModel>();
+      QuerySnapshot query = await firestore
+          .collection('users')
+          .where("phoneNumber", whereIn: phoneNumbers)
+          .getDocuments();
+      query.documents.forEach((doc) {
+        users.add(new ChatterUserModel(doc: doc));
+      });
+
+      return users;
     });
   }
 }

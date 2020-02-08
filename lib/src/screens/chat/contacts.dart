@@ -1,4 +1,6 @@
+import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/chatter_contact.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -20,11 +22,13 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   void initState() {
     super.initState();
-    new Future.delayed(const Duration(milliseconds: 100), initContact);
+    contactService = locator<ContactService>();
+    if (contactService.model == null)
+      new Future.delayed(const Duration(milliseconds: 100), initContact);
   }
 
   void initContact() async {
-    ContactService contactService = locator<ContactService>();
+    contactService = locator<ContactService>();
     UI.showSpinnerOverlay(context);
     await contactService.load();
     UI.closeSpinnerOverlay(context);
@@ -71,9 +75,19 @@ class _ContactsPageState extends State<ContactsPage> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SearchBarWidget(),
             ),
-            contactService != null
+            SizedBox(height: 5),
+            functionBuilder(
+                icon: Icons.group_add,
+                title: "New Group",
+                onPressed: () {},
+                color: Theme.of(context).accentColor),
+            functionBuilder(
+                icon: Icons.person_add,
+                title: "New Contact",
+                onPressed: () {},
+                color: Theme.of(context).accentColor),
+            contactService.model != null
                 ? ListView.separated(
-                    padding: EdgeInsets.only(top: 5),
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
                     primary: false,
@@ -85,13 +99,18 @@ class _ContactsPageState extends State<ContactsPage> {
                         contact: contactService.model[index], onPressed: () {}),
                   )
                 : SizedBox(),
+            functionBuilder(
+                icon: Icons.share, title: "Invite friend", onPressed: () {}),
+            functionBuilder(
+                icon: Icons.help, title: "Contacts help", onPressed: () {}),
           ],
         ),
       ),
     );
   }
 
-  Widget contactBuilder({Contact contact, Function onPressed}) {
+  Widget functionBuilder(
+      {IconData icon, String title, Function onPressed, Color color = Colors.transparent}) {
     return MaterialButton(
       onPressed: onPressed,
       child: Container(
@@ -108,20 +127,53 @@ class _ContactsPageState extends State<ContactsPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            contact.avatar != null && contact.avatar.length > 0
-                ? CircleAvatar(
-                    backgroundImage: MemoryImage(contact.avatar),
-                  )
-                : CircleAvatar(
-                    child: Text(
-                      contact.initials(),
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+            CircleAvatar(
+              backgroundColor: color,
+              child: new Icon(icon, color: color == Colors.transparent ? Theme.of(context).hintColor : Colors.white),
+            ),
+            // Padding(
+            //   padding: EdgeInsets.all(8),
+            //   child: new Icon(icon, color: color == null ? Theme.of(context).hintColor : Colors.white),
+            // ),
             SizedBox(width: 15),
             Expanded(
               child: Text(
-                contact.displayName,
+                title,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+                style: Theme.of(context).textTheme.subhead,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget contactBuilder({ChatterContact contact, Function onPressed}) {
+    return MaterialButton(
+      onPressed: onPressed,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+        decoration: BoxDecoration(
+          // color: Theme.of(context).primaryColor.withOpacity(0.9),
+          boxShadow: [
+            BoxShadow(
+                color: Theme.of(context).focusColor.withOpacity(0.1),
+                blurRadius: 5,
+                offset: Offset(0, 2)),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            CircleAvatar(
+                backgroundImage:
+                    Image.network(contact.chatterModel.photoUrl).image),
+            SizedBox(width: 15),
+            Expanded(
+              child: Text(
+                contact.contact.displayName,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: Theme.of(context).textTheme.subhead,

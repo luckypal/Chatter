@@ -1,33 +1,73 @@
+import 'dart:math';
+
+import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/chatter_contact.dart';
+import 'package:chatter/src/models/user.dart';
+import 'package:chatter/src/utils/utilities.dart';
 import 'package:contacts_service/contacts_service.dart';
+import 'package:chatter/src/services/user.dart';
 
 abstract class ContactService {
-  List<Contact> _models;
-  List<Contact> get model => _models;
+  UserService userService;
+  List<ChatterContact> _models;
+  List<ChatterContact> get model => _models;
 
   ContactService() {
     // load();
+    userService = locator<UserService>();
   }
 
-  Future<Iterable<Contact>> load();
-  void filter(Iterable<Contact> contacts);
+  Future<List<ChatterContact>> load();
+  Future<void> filter(Iterable<Contact> contacts);
 }
 
 class ContactServiceImpl extends ContactService {
   @override
-  Future<Iterable<Contact>> load() {
-    return new Future<Iterable<Contact>>(() async {
+  Future<List<ChatterContact>> load() {
+    return new Future<List<ChatterContact>>(() async {
       Iterable<Contact> contacts = await ContactsService.getContacts();
-      filter(contacts);
-      return contacts;
+      await filter(contacts);
+      return _models;
     });
   }
 
   @override
-  void filter(Iterable<Contact> contacts) {
-    _models = new List<Contact>();
-    contacts.forEach((contact) {
-      if (contact.phones.length == 0) return;
-      _models.add(contact);
+  Future<void> filter(Iterable<Contact> contacts) async {
+    return new Future<void>(() async {
+      List<String> phoneNumbers = List<String>();
+
+      Map<String, Contact> contactTable = Map<String, Contact>();
+
+      contacts.forEach((contact) {
+        if (contact.phones.length == 0) return;
+
+        // contact.phones.forEach((phoneNumber) => phoneNumbers.add(phoneNumber.value));
+        
+        contact.phones.forEach((phoneNumber) {
+          String newValue = Utilities.makeStandardPhoneNumber(phoneNumber.value);
+          phoneNumbers.add(newValue);
+          contactTable [newValue] = contact;
+        });
+      });
+
+      _models = new List<ChatterContact>();
+
+      int start = 0;
+      while(start < phoneNumbers.length) {
+        int end = min(start + 10, phoneNumbers.length);
+        List<String> subPhoneNumbers = phoneNumbers.sublist(start, end);
+        List<ChatterUserModel> userList = await userService.findUsers(phoneNumbers: subPhoneNumbers);
+        
+        userList.forEach((chatterUser) {
+          ChatterContact chatterContact = new ChatterContact();
+          chatterContact.chatterModel = chatterUser;
+          chatterContact.contact = contactTable[chatterUser.phoneNumber];
+
+          _models.add(chatterContact);
+        });
+
+        start += 10;
+      }
     });
   }
 }
