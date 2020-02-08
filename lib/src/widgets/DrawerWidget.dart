@@ -2,6 +2,7 @@ import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/user.dart';
+import 'package:chatter/src/widgets/ContactCircleAvatar.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 
@@ -42,6 +43,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 userService.user.phoneNumber,
                 style: Theme.of(context).textTheme.caption,
               ),
+              // currentAccountPicture: ContactCircleAvatar(
+              //   displayName: userService.user.displayName,
+              //   image: Image.network(userService.user.photoUrl).image,
+              // ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Theme.of(context).accentColor,
                 backgroundImage: Image.network(userService.user.photoUrl).image,

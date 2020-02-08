@@ -110,7 +110,10 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   Widget functionBuilder(
-      {IconData icon, String title, Function onPressed, Color color = Colors.transparent}) {
+      {IconData icon,
+      String title,
+      Function onPressed,
+      Color color = Colors.transparent}) {
     return MaterialButton(
       onPressed: onPressed,
       child: Container(
@@ -129,12 +132,11 @@ class _ContactsPageState extends State<ContactsPage> {
           children: <Widget>[
             CircleAvatar(
               backgroundColor: color,
-              child: new Icon(icon, color: color == Colors.transparent ? Theme.of(context).hintColor : Colors.white),
+              child: new Icon(icon,
+                  color: color == Colors.transparent
+                      ? Theme.of(context).hintColor
+                      : Colors.white),
             ),
-            // Padding(
-            //   padding: EdgeInsets.all(8),
-            //   child: new Icon(icon, color: color == null ? Theme.of(context).hintColor : Colors.white),
-            // ),
             SizedBox(width: 15),
             Expanded(
               child: Text(
@@ -150,9 +152,11 @@ class _ContactsPageState extends State<ContactsPage> {
     );
   }
 
-  Widget contactBuilder({ChatterContact contact, Function onPressed}) {
+  Widget contactBuilder(
+      {ChatterContact contact, Function onPressed, Function onLongPressed}) {
     return MaterialButton(
       onPressed: onPressed,
+      onLongPress: onLongPressed,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
         decoration: BoxDecoration(
