@@ -15,7 +15,7 @@ abstract class UserModel {
   String userName;
   String phoneNumber;
   String photoUrl;
-  int platform;
+  int platform;     //User Platform
   int lastOnlineTime;
   UserState userState;
 

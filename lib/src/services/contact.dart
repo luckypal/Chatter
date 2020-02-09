@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/models/chatter_contact.dart';
+import 'package:chatter/src/models/contact.dart';
 import 'package:chatter/src/models/user.dart';
 import 'package:chatter/src/services/server.dart';
 import 'package:chatter/src/utils/utilities.dart';
@@ -43,10 +43,8 @@ class ContactServiceImpl extends ContactService {
 
       contacts.forEach((contact) {
         if (contact.phones.length == 0) return;
-        print('${contact.androidAccountType}  ${contact.displayName}');
         
         contact.phones.forEach((phoneNumber) {
-          print('${phoneNumber.label}  ${phoneNumber.value}');
           String newValue = Utilities.makeStandardPhoneNumber(phoneNumber.value);
           contactTable [newValue] = contact;
         });

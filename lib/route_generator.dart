@@ -1,3 +1,4 @@
+import 'package:chatter/src/screens/chat/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/src/screens/init/splash.dart';
 import 'package:chatter/src/screens/init/on_boarding.dart';
@@ -29,6 +30,9 @@ class RouteGenerator {
 
       case '/Contacts':
         return MaterialPageRoute(builder: (_) => ContactsPage());
+
+      case '/Chat':
+        return MaterialPageRoute(builder: (_) => ChatPage(contact: args != null ? args : null));
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();

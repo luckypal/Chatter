@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/models/chatter_contact.dart';
+import 'package:chatter/src/models/contact.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -55,6 +55,10 @@ class _ContactsPageState extends State<ContactsPage> {
           if (value.length != 0) initContact();
         });
     }
+  }
+
+  void onContactPressed(BaseContact contact) {
+    Navigator.pushNamed(context, "/Chat", arguments: contact);
   }
 
   void onInviteFriend() {
@@ -122,7 +126,7 @@ class _ContactsPageState extends State<ContactsPage> {
                     },
                     itemCount: contactService.model.length,
                     itemBuilder: (context, index) => contactBuilder(
-                        contact: contactService.model[index], onPressed: () {}),
+                        contact: contactService.model[index], onPressed: () => onContactPressed(contactService.model[index])),
                   )
                 : SizedBox(),
             functionBuilder(
