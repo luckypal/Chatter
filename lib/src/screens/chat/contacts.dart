@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/models/chatter_contact.dart';
@@ -9,6 +11,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/services/contact.dart';
+import 'package:share/share.dart';
+import 'package:intent/intent.dart' as AndroidIntent;
+import 'package:intent/action.dart' as AndroidIntentAction;
+// import 'package:android_intent/android_intent.dart';
 
 class ContactsPage extends StatefulWidget {
   @override
@@ -36,6 +42,26 @@ class _ContactsPageState extends State<ContactsPage> {
       this.contactService = contactService;
     });
   }
+
+  void onNewGroup() {}
+
+  void onNewContact() async {
+    if (Platform.isAndroid) {
+      AndroidIntent.Intent()
+        ..setAction(AndroidIntentAction.Action.ACTION_INSERT)
+        ..setData(Uri.parse('content://contacts'))
+        ..setType("vnd.android.cursor.dir/contact")
+        ..startActivityForResult().then((List<String> value) {
+          if (value.length != 0) initContact();
+        });
+    }
+  }
+
+  void onInviteFriend() {
+    Share.share(UIText.invitationMsg, subject: 'Invite to ${UIText.appName}');
+  }
+
+  void onContactsHelp() {}
 
   @override
   Widget build(BuildContext context) {
@@ -79,12 +105,12 @@ class _ContactsPageState extends State<ContactsPage> {
             functionBuilder(
                 icon: Icons.group_add,
                 title: "New Group",
-                onPressed: () {},
+                onPressed: onNewGroup,
                 color: Theme.of(context).accentColor),
             functionBuilder(
                 icon: Icons.person_add,
                 title: "New Contact",
-                onPressed: () {},
+                onPressed: onNewContact,
                 color: Theme.of(context).accentColor),
             contactService.model != null
                 ? ListView.separated(
@@ -100,9 +126,13 @@ class _ContactsPageState extends State<ContactsPage> {
                   )
                 : SizedBox(),
             functionBuilder(
-                icon: Icons.share, title: "Invite friend", onPressed: () {}),
+                icon: Icons.share,
+                title: "Invite friend",
+                onPressed: onInviteFriend),
             functionBuilder(
-                icon: Icons.help, title: "Contacts help", onPressed: () {}),
+                icon: Icons.help,
+                title: "Contacts help",
+                onPressed: onContactsHelp),
           ],
         ),
       ),
