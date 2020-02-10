@@ -62,7 +62,7 @@ class ContactServiceImpl extends ContactService {
         
         userList.forEach((chatterUser) {
           ChatterContact chatterContact = new ChatterContact();
-          chatterContact.chatterModel = chatterUser;
+          chatterContact.userModel = chatterUser;
           chatterContact.contact = contactTable[chatterUser.phoneNumber];
 
           _models.add(chatterContact);

@@ -4,9 +4,9 @@ import 'package:contacts_service/contacts_service.dart';
 class BaseContact {
   int platform;     //UserPlatform
   dynamic contact;
-  UserModel chatterModel;
+  UserModel userModel;
 }
 class ChatterContact extends BaseContact {
   // Contact contact;
-  // ChatterUserModel chatterModel;
+  // ChatterUserModel userModel;
 }

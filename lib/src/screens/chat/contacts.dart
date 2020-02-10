@@ -207,7 +207,7 @@ class _ContactsPageState extends State<ContactsPage> {
           children: <Widget>[
             CircleAvatar(
                 backgroundImage:
-                    Image.network(contact.chatterModel.photoUrl).image),
+                    Image.network(contact.userModel.photoUrl).image),
             SizedBox(width: 15),
             Expanded(
               child: Text(
