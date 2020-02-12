@@ -12,9 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/services/contact.dart';
 import 'package:share/share.dart';
-import 'package:intent/intent.dart' as AndroidIntent;
-import 'package:intent/action.dart' as AndroidIntentAction;
-// import 'package:android_intent/android_intent.dart';
+// import 'package:intent/intent.dart' as AndroidIntent1;
+import 'package:intent/action.dart' as AndroidIntentActions;
+import 'package:android_intent/android_intent.dart';
 
 class ContactsPage extends StatefulWidget {
   @override
@@ -47,13 +47,19 @@ class _ContactsPageState extends State<ContactsPage> {
 
   void onNewContact() async {
     if (Platform.isAndroid) {
-      AndroidIntent.Intent()
-        ..setAction(AndroidIntentAction.Action.ACTION_INSERT)
-        ..setData(Uri.parse('content://contacts'))
-        ..setType("vnd.android.cursor.dir/contact")
-        ..startActivityForResult().then((List<String> value) {
-          if (value.length != 0) initContact();
-        });
+      // AndroidIntent.Intent()
+      //   ..setAction(AndroidIntentAction.Action.ACTION_INSERT)
+      //   ..setData(Uri.parse('content://contacts'))
+      //   ..setType("vnd.android.cursor.dir/contact")
+      //   ..startActivityForResult().then((List<String> value) {
+      //     if (value.length != 0) initContact();
+      //   });
+      AndroidIntent intent = AndroidIntent(
+        action: AndroidIntentActions.Action.ACTION_INSERT,
+        data: 'content://contacts',
+        type: "vnd.android.cursor.dir/contact",
+      );
+      await intent.launch();
     }
   }
 
@@ -126,7 +132,9 @@ class _ContactsPageState extends State<ContactsPage> {
                     },
                     itemCount: contactService.model.length,
                     itemBuilder: (context, index) => contactBuilder(
-                        contact: contactService.model[index], onPressed: () => onContactPressed(contactService.model[index])),
+                        contact: contactService.model[index],
+                        onPressed: () =>
+                            onContactPressed(contactService.model[index])),
                   )
                 : SizedBox(),
             functionBuilder(

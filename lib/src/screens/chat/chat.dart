@@ -8,8 +8,9 @@ import 'package:chatter/src/models/contact.dart';
 import 'package:chatter/src/models/user.dart';
 // import 'package:chatter/src/widgets/ChatMessageListItemWidget.dart';
 import 'package:flutter/material.dart';
-import 'package:intent/intent.dart' as AndroidIntent;
-import 'package:intent/action.dart' as AndroidIntentAction;
+// import 'package:intent/intent.dart' as AndroidIntent;
+import 'package:intent/action.dart' as AndroidIntentActions;
+import 'package:android_intent/android_intent.dart';
 
 class Choice {
   const Choice({this.title, this.icon});
@@ -19,7 +20,7 @@ class Choice {
 }
 
 class ChatPage extends StatefulWidget {
-  final BaseContact contact;
+  final ChatterContact contact;
   const ChatPage({Key key, this.contact}) : super(key: key);
 
   @override
@@ -61,12 +62,23 @@ class _ChatPageState extends State<ChatPage> {
     if (choice.icon == Icons.contacts) {
       //Show contact
       if (Platform.isAndroid) {
-        AndroidIntent.Intent()
-          ..setAction(AndroidIntentAction.Action.ACTION_INSERT_OR_EDIT)
-          ..setData(Uri.parse('content://contacts'))
-          ..setType("vnd.android.cursor.dir/contact")
-          ..startActivityForResult().then((List<String> value) {
-          });
+        String identifier = widget.contact.contact.identifier;
+        // AndroidIntent.Intent()
+        //   ..setAction(AndroidIntentAction.Action.ACTION_EDIT)   //ACTION_INSERT_OR_EDIT
+        //   ..setData(Uri.parse('content://contacts/people/$identifier'))
+        //   // ..setType("vnd.android.cursor.item/contact")
+        //   ..startActivityForResult().then((dynamic value) {
+        //     print("Done");
+        //   }).catchError((error) {
+        //     print("Error");
+        //   });
+
+        AndroidIntent intent = AndroidIntent(
+          action: AndroidIntentActions.Action.ACTION_EDIT,
+          data: 'content://contacts/people/$identifier',
+          type: "vnd.android.cursor.item/contact",
+        );
+        intent.launch();
       }
     }
     setState(() {});
