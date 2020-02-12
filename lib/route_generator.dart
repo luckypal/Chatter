@@ -1,4 +1,3 @@
-import 'package:chatter/src/screens/chat/chat.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/src/screens/init/splash.dart';
 import 'package:chatter/src/screens/init/on_boarding.dart';
@@ -7,6 +6,8 @@ import 'package:chatter/src/screens/init/phone_verify.dart';
 import 'package:chatter/src/screens/init/profile_init.dart';
 import 'package:chatter/src/screens/tabs/tabs.dart';
 import 'package:chatter/src/screens/chat/contacts.dart';
+import 'package:chatter/src/screens/chat/contacts_group.dart';
+import 'package:chatter/src/screens/chat/chat.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -30,6 +31,8 @@ class RouteGenerator {
 
       case '/Contacts':
         return MaterialPageRoute(builder: (_) => ContactsPage());
+      case '/ContactsGroup':
+        return MaterialPageRoute(builder: (_) => ContactsGroupPage());
 
       case '/Chat':
         return MaterialPageRoute(builder: (_) => ChatPage(contact: args != null ? args : null));

@@ -6,7 +6,7 @@ import 'package:chatter/src/models/contact.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
-import 'package:contacts_service/contacts_service.dart';
+import 'package:chatter/src/widgets/ContactWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
@@ -43,7 +43,9 @@ class _ContactsPageState extends State<ContactsPage> {
     });
   }
 
-  void onNewGroup() {}
+  void onNewGroup() {
+    Navigator.popAndPushNamed(context, "/ContactsGroup");
+  }
 
   void onNewContact() async {
     if (Platform.isAndroid) {
@@ -131,7 +133,7 @@ class _ContactsPageState extends State<ContactsPage> {
                       return SizedBox(height: 0);
                     },
                     itemCount: contactService.model.length,
-                    itemBuilder: (context, index) => contactBuilder(
+                    itemBuilder: (context, index) => ContactWidget(
                         contact: contactService.model[index],
                         onPressed: () =>
                             onContactPressed(contactService.model[index])),
@@ -183,43 +185,6 @@ class _ContactsPageState extends State<ContactsPage> {
             Expanded(
               child: Text(
                 title,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                style: Theme.of(context).textTheme.subhead,
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget contactBuilder(
-      {ChatterContact contact, Function onPressed, Function onLongPressed}) {
-    return MaterialButton(
-      onPressed: onPressed,
-      onLongPress: onLongPressed,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-        decoration: BoxDecoration(
-          // color: Theme.of(context).primaryColor.withOpacity(0.9),
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).focusColor.withOpacity(0.1),
-                blurRadius: 5,
-                offset: Offset(0, 2)),
-          ],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            CircleAvatar(
-                backgroundImage:
-                    Image.network(contact.userModel.photoUrl).image),
-            SizedBox(width: 15),
-            Expanded(
-              child: Text(
-                contact.contact.displayName,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: Theme.of(context).textTheme.subhead,

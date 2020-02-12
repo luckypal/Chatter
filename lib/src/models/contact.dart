@@ -12,7 +12,9 @@ abstract class BaseContact {
   UserModel get userModel => _userModel;
   set userModel(UserModel value) => _userModel = value;
 
+  String get identifier => _userModel.id;
   String get name => _userModel.userName;
+  String get photoUrl => _userModel.photoUrl;
 }
 
 class ChatterContact extends BaseContact {
