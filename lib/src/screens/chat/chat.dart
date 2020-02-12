@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/src/models/contact.dart';
@@ -7,6 +8,8 @@ import 'package:chatter/src/models/contact.dart';
 import 'package:chatter/src/models/user.dart';
 // import 'package:chatter/src/widgets/ChatMessageListItemWidget.dart';
 import 'package:flutter/material.dart';
+import 'package:intent/intent.dart' as AndroidIntent;
+import 'package:intent/action.dart' as AndroidIntentAction;
 
 class Choice {
   const Choice({this.title, this.icon});
@@ -14,17 +17,6 @@ class Choice {
   final String title;
   final IconData icon;
 }
-
-const List<Choice> choices = const <Choice>[
-  const Choice(title: '', icon: Icons.videocam),
-  const Choice(title: '', icon: Icons.phone),
-  const Choice(title: 'View Contact', icon: Icons.contacts),
-  const Choice(title: 'Media, links, and docs', icon: Icons.perm_media),
-  const Choice(title: 'Search', icon: Icons.search),
-  const Choice(title: 'Mute notifications', icon: Icons.notifications_off),
-  const Choice(title: 'Wallpaper', icon: Icons.wallpaper),
-  const Choice(title: 'More', icon: Icons.more_horiz),
-];
 
 class ChatPage extends StatefulWidget {
   final BaseContact contact;
@@ -37,6 +29,18 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   // ConversationsList _conversationList = new ConversationsList();
   // User _currentUser = new User.init().getCurrentUser();
+
+  final List<Choice> choices = const <Choice>[
+    const Choice(title: '', icon: Icons.videocam),
+    const Choice(title: '', icon: Icons.phone),
+    const Choice(title: 'View Contact', icon: Icons.contacts),
+    const Choice(title: 'Media, links, and docs', icon: Icons.perm_media),
+    const Choice(title: 'Search', icon: Icons.search),
+    const Choice(title: 'Mute notifications', icon: Icons.notifications_off),
+    const Choice(title: 'Wallpaper', icon: Icons.wallpaper),
+    const Choice(title: 'More', icon: Icons.more_horiz),
+  ];
+
   final _myListKey = GlobalKey<AnimatedListState>();
   final myController = TextEditingController();
   final focusNode = new FocusNode();
@@ -53,10 +57,19 @@ class _ChatPageState extends State<ChatPage> {
     super.dispose();
   }
 
-  void _select(Choice choice) {
-    // Causes the app to rebuild with the new _selectedChoice.
-    setState(() {
-    });
+  void _selectMenu(Choice choice) {
+    if (choice.icon == Icons.contacts) {
+      //Show contact
+      if (Platform.isAndroid) {
+        AndroidIntent.Intent()
+          ..setAction(AndroidIntentAction.Action.ACTION_INSERT_OR_EDIT)
+          ..setData(Uri.parse('content://contacts'))
+          ..setType("vnd.android.cursor.dir/contact")
+          ..startActivityForResult().then((List<String> value) {
+          });
+      }
+    }
+    setState(() {});
   }
 
   @override
@@ -85,7 +98,7 @@ class _ChatPageState extends State<ChatPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.contact.userModel.userName,
+                  widget.contact.name,
                   style: Theme.of(context).textTheme.display1,
                 ),
                 Text("Last seen at yesterday.",
@@ -95,16 +108,16 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
         actions: <Widget>[
-          new IconButton(
-            icon: new Icon(choices[0].icon, color: Theme.of(context).hintColor),
-            onPressed: () => _select(choices[0]),
-          ),
-          new IconButton(
-            icon: new Icon(Icons.phone, color: Theme.of(context).hintColor),
-            onPressed: () => _select(choices[1]),
-          ),
+          // new IconButton(
+          //   icon: new Icon(choices[0].icon, color: Theme.of(context).hintColor),
+          //   onPressed: () => _select(choices[0]),
+          // ),
+          // new IconButton(
+          //   icon: new Icon(Icons.phone, color: Theme.of(context).hintColor),
+          //   onPressed: () => _select(choices[1]),
+          // ),
           PopupMenuButton<Choice>(
-            onSelected: _select,
+            onSelected: _selectMenu,
             icon: Icon(Icons.more_vert, color: Theme.of(context).hintColor),
             itemBuilder: (BuildContext context) {
               return choices.skip(2).map((Choice choice) {
