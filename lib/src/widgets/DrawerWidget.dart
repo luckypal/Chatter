@@ -1,7 +1,7 @@
 import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/services/user.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/widgets/ContactCircleAvatar.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
@@ -12,12 +12,12 @@ class DrawerWidget extends StatefulWidget {
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
-  UserService userService;
+  OwnerUserService ownerService;
   
   @override
   void initState() {
     super.initState();
-    userService = locator<UserService>();
+    ownerService = locator<OwnerUserService>();
   }
 
   @override
@@ -36,11 +36,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 //              borderRadius: BorderRadius.only(bottomLeft: Radius.circular(35)),
               ),
               accountName: Text(
-                userService.user.displayName,
+                ownerService.model.userName,
                 style: Theme.of(context).textTheme.title,
               ),
               accountEmail: Text(
-                userService.user.phoneNumber,
+                ownerService.model.phoneNumber,
                 style: Theme.of(context).textTheme.caption,
               ),
               // currentAccountPicture: ContactCircleAvatar(
@@ -49,7 +49,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               // ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Theme.of(context).accentColor,
-                backgroundImage: Image.network(userService.user.photoUrl).image,
+                backgroundImage: Image.network(ownerService.model.photoUrl).image,
               ),
             ),
           ),

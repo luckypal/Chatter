@@ -1,8 +1,7 @@
-import 'package:chatter/src/models/user.dart';
+/*import 'package:chatter/src/models/user.dart';
 import 'package:contacts_service/contacts_service.dart';
 
 abstract class BaseContact {
-  int platform; //UserPlatform
   dynamic _contact;
   UserModel _userModel;
 
@@ -16,6 +15,7 @@ abstract class BaseContact {
   String get name => _userModel.userName;
   String get photoUrl => _userModel.photoUrl;
   String get phoneNumber => _userModel.phoneNumber;
+  int get platform => _userModel.platform;
 }
 
 class ChatterContact extends BaseContact {
@@ -24,3 +24,4 @@ class ChatterContact extends BaseContact {
 
   String get name => _contact.displayName;
 }
+*/

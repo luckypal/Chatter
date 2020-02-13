@@ -1,8 +1,5 @@
-import 'dart:io' show Platform;
-import 'package:chatter/config/text.dart';
-import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/models/contact.dart';
+import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -11,13 +8,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/services/phone_contact.dart';
-import 'package:share/share.dart';
-// import 'package:intent/intent.dart' as AndroidIntent1;
-import 'package:intent/action.dart' as AndroidIntentActions;
-import 'package:android_intent/android_intent.dart';
 
 class ContactsGroupPage extends StatefulWidget {
-  final List<BaseContact> selectedContacts;
+  final List<UserModel> selectedContacts;
 
   ContactsGroupPage({this.selectedContacts});
 
@@ -28,8 +21,8 @@ class ContactsGroupPage extends StatefulWidget {
 class _ContactsGroupPageState extends State<ContactsGroupPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   PhoneContactService contactService;
-  List<BaseContact> contacts;
-  List<BaseContact> selectedContacts;
+  List<UserModel> contacts;
+  List<UserModel> selectedContacts;
   String searchText = "";
 
   @override
@@ -41,12 +34,12 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
     if (widget.selectedContacts != null)
       selectedContacts = widget.selectedContacts;
     else
-      selectedContacts = new List<BaseContact>();
+      selectedContacts = new List<UserModel>();
   }
 
   void onDeselectAll() {
     setState(() {
-      selectedContacts = new List<BaseContact>();
+      selectedContacts = new List<UserModel>();
     });
   }
 
@@ -76,19 +69,19 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
     });
   }
 
-  int getContactIndex(BaseContact contact) {
+  int getContactIndex(UserModel contact) {
     return selectedContacts.indexOf(contact);
   }
 
-  bool isContactSelected(BaseContact contact) {
+  bool isContactSelected(UserModel contact) {
     return getContactIndex(contact) != -1;
   }
 
   bool get isSelectedContact => selectedContacts.length != 0;
 
-  void onContactPressed(BaseContact contact) {
+  void onContactPressed(UserModel contact) {
     int index = getContactIndex(contact);
-    List<BaseContact> temp = selectedContacts;
+    List<UserModel> temp = selectedContacts;
     if (index == -1)
       temp.add(contact);
     else

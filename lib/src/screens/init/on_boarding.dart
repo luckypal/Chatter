@@ -1,8 +1,4 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/services/phone_verify.dart';
-import 'package:chatter/src/services/user.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
@@ -23,16 +19,6 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
     _onBoardingList = new OnBoardingList();
     slider = getSlider();
     super.initState();
-    
-    /*UserService userService = locator<UserService>();
-    userService.load().then((FirebaseUser user) {
-      if (userService.user != null) {
-        if (userService.user.displayName == null)
-          Navigator.pushReplacementNamed(context, "/ProfileInit");
-        else
-          Navigator.pushReplacementNamed(context, "/Tabs", arguments: 2);
-      }
-    });*/
   }
 
   onSkip() {

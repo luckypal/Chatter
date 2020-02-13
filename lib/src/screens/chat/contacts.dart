@@ -2,7 +2,7 @@ import 'dart:io' show Platform;
 import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/models/contact.dart';
+import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/services/phone_contact.dart';
 import 'package:share/share.dart';
-// import 'package:intent/intent.dart' as AndroidIntent1;
+// import 'package:intent/intent.dart' as AndroidIntent;
 import 'package:intent/action.dart' as AndroidIntentActions;
 import 'package:android_intent/android_intent.dart';
 
@@ -24,14 +24,14 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   PhoneContactService contactService;
-  List<BaseContact> contacts;
+  List<UserModel> contacts;
   String searchText = "";
 
   @override
   void initState() {
     super.initState();
     contactService = locator<PhoneContactService>();
-    
+
     if (contactService.model == null)
       new Future.delayed(const Duration(milliseconds: 100), initContact);
     else
@@ -78,8 +78,8 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
-  void onContactPressed(BaseContact contact) {
-    List<BaseContact> contacts = new List<BaseContact>();
+  void onContactPressed(UserModel contact) {
+    List<UserModel> contacts = new List<UserModel>();
     contacts.add(contact);
     Navigator.popAndPushNamed(context, "/Chat", arguments: {
       "name": null,

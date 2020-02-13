@@ -2,9 +2,8 @@ import 'dart:io';
 
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/services/user.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatter/src/screens/chat/conversations.dart';
 // import 'package:chatter/src/screens/chat.dart';
 // import 'package:chatter/src/screens/favorites.dart';
@@ -37,14 +36,14 @@ class TabsWidget extends StatefulWidget {
 
 class _TabsWidgetState extends State<TabsWidget> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  UserService userService;
+  OwnerUserService ownerUserService;
   
   @override
   initState() {
     _selectTab(widget.currentTab);
     super.initState();
     
-    userService = locator<UserService>();
+    ownerUserService = locator<OwnerUserService>();
 
     // Firestore firestore = Firestore.instance;
     // firestore.collection('users').where("phoneNumber", isEqualTo: "+17865778328").snapshots().listen((data) {
@@ -141,7 +140,7 @@ class _TabsWidgetState extends State<TabsWidget> {
                     Navigator.of(context).pushNamed('/Tabs', arguments: 1);
                   },
                   child: CircleAvatar(
-                    backgroundImage: Image.network(userService.user.photoUrl).image,
+                    backgroundImage: Image.network(ownerUserService.model.photoUrl).image,
                   ),
                 )),
           ],

@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/server.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 // import 'package:flutter/services.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/src/utils/ui.dart';
-import 'package:chatter/src/services/user.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
 
@@ -21,7 +21,7 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
   File croppedImgFile;
   Image croppedImg;
 
-  UserService userService;
+  OwnerUserService userService;
   ServerService serverService;
 
   TextEditingController userNameController;
@@ -31,7 +31,7 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
   void initState() {
     super.initState();
     
-    userService = locator<UserService>();
+    userService = locator<OwnerUserService>();
     if (userService.user != null && userService.user.displayName != null) {
       userName = userService.user.displayName;
     }
@@ -90,13 +90,11 @@ class _ProfileInitPageState extends State<ProfileInitPage> {
 
       String photoUrl = uploadResult ["data"]["imageUrl"];
 
-      FirebaseUser user = await FirebaseAuth.instance.currentUser();
       UserUpdateInfo userUpdateInfo = new UserUpdateInfo();
       userUpdateInfo.displayName = userName;
       userUpdateInfo.photoUrl = photoUrl;
 
-      await userService.saveToDatabase(userUpdateInfo);
-      await user.updateProfile(userUpdateInfo);
+      await userService.update(userUpdateInfo);
       await userService.load();
 
       UI.closeSpinnerOverlay(context);

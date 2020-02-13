@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:chatter/src/models/contact.dart';
+import 'package:chatter/src/models/user/base.dart';
 
 @immutable
 class ContactWidget extends StatefulWidget {
-  final BaseContact contact;
+  final UserModel contact;
   final Function onPressed;
   final Function onLongPressed;
   final bool isSelected;
@@ -62,7 +62,7 @@ class _ContactWidgetState extends State<ContactWidget> {
             SizedBox(width: 15),
             Expanded(
               child: Text(
-                widget.contact.name,
+                widget.contact.userName,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: Theme.of(context).textTheme.subhead,

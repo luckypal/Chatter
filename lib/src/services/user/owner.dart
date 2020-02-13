@@ -1,30 +1,31 @@
+import 'package:chatter/src/services/user/base.dart';
 import 'package:country_code_picker/country_code.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:chatter/src/models/user.dart';
+import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/models/user/chatter.dart';
 import 'package:flutter/services.dart';
 
-abstract class UserService {
+abstract class OwnerUserService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final Firestore firestore = Firestore.instance;
+
   FirebaseUser _user;
   FirebaseUser get user => _user;
-  CountryCode countryCode;
 
   ChatterUserModel _model;
   ChatterUserModel get model => _model;
 
-  UserService() {
-    // load();
-  }
+  CountryCode countryCode;
+
+  OwnerUserService();
 
   Future<FirebaseUser> load({bool isStrict = true});
-  Future<void> saveToDatabase(UserUpdateInfo userUpdateInfo);
-  Future<List<ChatterUserModel>> findUsers({List<String> phoneNumbers});
+  Future<void> update(UserUpdateInfo userUpdateInfo);
 }
 
-class UserServiceImpl extends UserService {
+class OwnerUserServiceImpl extends OwnerUserService {
   @override
   Future<FirebaseUser> load({bool isStrict = true}) {
     return new Future(() async {
@@ -36,7 +37,6 @@ class UserServiceImpl extends UserService {
       QuerySnapshot query = await firestore
           .collection('users')
           .where("phoneNumber", isEqualTo: _user.phoneNumber)
-          .where("platform", isEqualTo: UserPlatform.chatter)
           .limit(1)
           .getDocuments();
 
@@ -63,7 +63,7 @@ class UserServiceImpl extends UserService {
   }
 
   @override
-  Future<void> saveToDatabase(UserUpdateInfo userUpdateInfo) {
+  Future<void> update(UserUpdateInfo userUpdateInfo) {
     return new Future(() async {
       _user = await firebaseAuth.currentUser();
       await firestore.collection('users').document(user.uid).setData({
@@ -79,22 +79,8 @@ class UserServiceImpl extends UserService {
           "name": countryCode.name //ex: United States
         }
       });
-    });
-  }
-
-  @override
-  Future<List<ChatterUserModel>> findUsers({List<String> phoneNumbers}) {
-    return new Future<List<ChatterUserModel>>(() async {
-      List<ChatterUserModel> users = new List<ChatterUserModel>();
-      QuerySnapshot query = await firestore
-          .collection('users')
-          .where("phoneNumber", whereIn: phoneNumbers)
-          .getDocuments();
-      query.documents.forEach((doc) {
-        users.add(new ChatterUserModel(doc: doc));
-      });
-
-      return users;
+      
+      await _user.updateProfile(userUpdateInfo);
     });
   }
 }

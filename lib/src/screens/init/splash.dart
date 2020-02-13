@@ -1,6 +1,6 @@
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
-import 'package:chatter/src/services/user.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,8 +23,8 @@ class _SplashPageState extends State<SplashPage> {
   void initUser() async {
     UI.showSpinnerOverlay(context);
     
-    UserService userService = locator<UserService>();
-    FirebaseUser user = await userService.load();
+    OwnerUserService ownerUserService = locator<OwnerUserService>();
+    FirebaseUser user = await ownerUserService.load();
 
     UI.closeSpinnerOverlay(context);
 

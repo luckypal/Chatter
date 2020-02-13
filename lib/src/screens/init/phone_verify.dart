@@ -1,3 +1,4 @@
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:country_code_picker/country_code_picker.dart';
@@ -9,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:phone_number/phone_number.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:chatter/src/services/phone_verify.dart';
-import 'package:chatter/src/services/user.dart';
 import 'package:chatter/service_locator.dart';
 
 class PhoneInputArguments {
@@ -93,7 +93,7 @@ class _PhoneVerifyPageState extends State<PhoneVerifyPage> {
       await firebaseAuth.signInWithCredential(_authCredential);
       phoneVerifyService.isDone = true;
       
-      UserService userService = locator<UserService>();
+      OwnerUserService userService = locator<OwnerUserService>();
       FirebaseUser user = await userService.load(isStrict: false);
       
       UI.closeSpinnerOverlay(context);

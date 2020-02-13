@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:chatter/config/ui_icons.dart';
-import 'package:chatter/src/models/contact.dart';
+// import 'package:chatter/src/models/contact.dart';
 // import 'package:chatter/src/models/chat.dart';
 // import 'package:chatter/src/models/conversation.dart';
-import 'package:chatter/src/models/user.dart';
+import 'package:chatter/src/models/user/base.dart';
 // import 'package:chatter/src/widgets/ChatMessageListItemWidget.dart';
 import 'package:flutter/material.dart';
 // import 'package:intent/intent.dart' as AndroidIntent;
@@ -21,7 +21,7 @@ class Choice {
 
 class ChatPage extends StatefulWidget {
   final String name;
-  final List<BaseContact> contacts;
+  final List<UserModel> contacts;
 
   const ChatPage({Key key, this.name, this.contacts}) : super(key: key);
 
@@ -64,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
     if (choice.icon == Icons.contacts) {
       //Show contact
       if (Platform.isAndroid) {
-        String identifier = widget.contacts[0].contact.identifier;
+        String identifier = widget.contacts[0].identifier;
 
         AndroidIntent intent = AndroidIntent(
           action: AndroidIntentActions.Action.ACTION_EDIT,
@@ -79,17 +79,17 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget buildTitleWidget() {
     if (widget.contacts.length == 1) {
-      BaseContact contact = widget.contacts[0];
+      UserModel contact = widget.contacts[0];
       return Row(
         children: [
           CircleAvatar(
-              backgroundImage: Image.network(contact.userModel.photoUrl).image),
+              backgroundImage: Image.network(contact.photoUrl).image),
           SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                contact.name,
+                contact.userName,
                 style: Theme.of(context).textTheme.display1,
               ),
               Text("Last seen at yesterday.",
@@ -108,11 +108,11 @@ class _ChatPageState extends State<ChatPage> {
               height: 15,
               child: CircleAvatar(
                 backgroundImage:
-                    Image.network(contact.userModel.photoUrl).image,
+                    Image.network(contact.photoUrl).image,
               ),
             ),
             Text(
-              contact.name,
+              contact.userName,
               style: Theme.of(context).textTheme.body1,
             ),
             SizedBox(
