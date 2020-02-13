@@ -27,9 +27,10 @@ class _ContactWidgetState extends State<ContactWidget> {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      color: widget.isSelected ? Colors.white70 : null,
+      color: widget.isSelected ? Theme.of(context).focusColor.withOpacity(0.2) : null,
       onPressed: widget.onPressed,
       onLongPress: widget.onLongPressed,
+      elevation: 0,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
         decoration: BoxDecoration(

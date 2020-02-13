@@ -15,6 +15,7 @@ abstract class BaseContact {
   String get identifier => _userModel.id;
   String get name => _userModel.userName;
   String get photoUrl => _userModel.photoUrl;
+  String get phoneNumber => _userModel.phoneNumber;
 }
 
 class ChatterContact extends BaseContact {

@@ -8,34 +8,35 @@ import 'package:chatter/src/utils/utilities.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:chatter/src/services/user.dart';
 
-abstract class ContactService {
+abstract class PhoneContactService {
   UserService userService;
   ServerService serverService;
   List<ChatterContact> _models;
   List<ChatterContact> get model => _models;
 
-  ContactService() {
+  PhoneContactService() {
     // load();
     userService = locator<UserService>();
     serverService = locator<ServerService>();
   }
 
   Future<List<ChatterContact>> load();
-  Future<void> filter(Iterable<Contact> contacts);
+  Future<void> filterWithServer(Iterable<Contact> contacts);
+  List<ChatterContact> filterContacts(String filterText);
 }
 
-class ContactServiceImpl extends ContactService {
+class PhoneContactServiceImpl extends PhoneContactService {
   @override
   Future<List<ChatterContact>> load() {
     return new Future<List<ChatterContact>>(() async {
       Iterable<Contact> contacts = await ContactsService.getContacts();
-      await filter(contacts);
+      await filterWithServer(contacts);
       return _models;
     });
   }
 
   @override
-  Future<void> filter(Iterable<Contact> contacts) async {
+  Future<void> filterWithServer(Iterable<Contact> contacts) async {
     return new Future<void>(() async {
       // List<String> phoneNumbers = List<String>();
 
@@ -43,10 +44,11 @@ class ContactServiceImpl extends ContactService {
 
       contacts.forEach((contact) {
         if (contact.phones.length == 0) return;
-        
+
         contact.phones.forEach((phoneNumber) {
-          String newValue = Utilities.makeStandardPhoneNumber(phoneNumber.value);
-          contactTable [newValue] = contact;
+          String newValue =
+              Utilities.makeStandardPhoneNumber(phoneNumber.value);
+          contactTable[newValue] = contact;
         });
       });
 
@@ -55,11 +57,12 @@ class ContactServiceImpl extends ContactService {
       List<String> phoneNumbers = contactTable.keys.toList(growable: false);
       // await serverService.findPhones(phoneNumbers);
 
-      while(start < phoneNumbers.length) {
+      while (start < phoneNumbers.length) {
         int end = min(start + 10, phoneNumbers.length);
         List<String> subPhoneNumbers = phoneNumbers.sublist(start, end);
-        List<ChatterUserModel> userList = await userService.findUsers(phoneNumbers: subPhoneNumbers);
-        
+        List<ChatterUserModel> userList =
+            await userService.findUsers(phoneNumbers: subPhoneNumbers);
+
         userList.forEach((chatterUser) {
           ChatterContact chatterContact = new ChatterContact();
           chatterContact.userModel = chatterUser;
@@ -71,5 +74,19 @@ class ContactServiceImpl extends ContactService {
         start += 10;
       }
     });
+  }
+
+  @override
+  List<ChatterContact> filterContacts(String filterText) {
+    List<ChatterContact> contactsResult = new List<ChatterContact>();
+    filterText = filterText.toLowerCase();
+
+    model.forEach((contact) {
+      if (contact.name.toLowerCase().contains(filterText) ||
+          contact.phoneNumber.toLowerCase().contains(filterText))
+        contactsResult.add(contact);
+    });
+
+    return contactsResult;
   }
 }

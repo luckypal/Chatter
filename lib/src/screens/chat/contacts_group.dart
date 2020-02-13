@@ -10,7 +10,7 @@ import 'package:chatter/src/widgets/ContactWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
-import 'package:chatter/src/services/contact.dart';
+import 'package:chatter/src/services/phone_contact.dart';
 import 'package:share/share.dart';
 // import 'package:intent/intent.dart' as AndroidIntent1;
 import 'package:intent/action.dart' as AndroidIntentActions;
@@ -27,13 +27,16 @@ class ContactsGroupPage extends StatefulWidget {
 
 class _ContactsGroupPageState extends State<ContactsGroupPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  ContactService contactService;
+  PhoneContactService contactService;
+  List<BaseContact> contacts;
   List<BaseContact> selectedContacts;
+  String searchText = "";
 
   @override
   void initState() {
     super.initState();
-    contactService = locator<ContactService>();
+    contactService = locator<PhoneContactService>();
+    contacts = contactService.model;
 
     if (widget.selectedContacts != null)
       selectedContacts = widget.selectedContacts;
@@ -43,7 +46,7 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
 
   void onCreateGroup() {
     if (selectedContacts.length == 1) {
-      Navigator.pushNamed(context, "/Chat", arguments: {
+      Navigator.popAndPushNamed(context, "/Chat", arguments: {
         "name": null,
         "contacts": selectedContacts,
       });
@@ -52,12 +55,19 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
         context,
         label: "Group chat name",
         onResult: (bool result, String value) {
-          Navigator.pushNamed(context, "/Chat", arguments: {
+          Navigator.popAndPushNamed(context, "/Chat", arguments: {
             "name": value,
             "contacts": selectedContacts,
           });
         },
       );
+  }
+
+  void onChangedSearchText(String value) {
+    setState(() {
+      searchText = value;
+      contacts = contactService.filterContacts(value);
+    });
   }
 
   int getContactIndex(BaseContact contact) {
@@ -119,10 +129,12 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SearchBarWidget(),
+              child: SearchBarWidget(
+                onChanged: onChangedSearchText,
+              ),
             ),
             SizedBox(height: 5),
-            contactService.model != null
+            contacts != null
                 ? ListView.separated(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
@@ -130,13 +142,11 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
                     separatorBuilder: (context, index) {
                       return SizedBox(height: 0);
                     },
-                    itemCount: contactService.model.length,
+                    itemCount: contacts.length,
                     itemBuilder: (context, index) => ContactWidget(
-                      contact: contactService.model[index],
-                      onPressed: () =>
-                          onContactPressed(contactService.model[index]),
-                      isSelected:
-                          isContactSelected(contactService.model[index]),
+                      contact: contacts[index],
+                      onPressed: () => onContactPressed(contacts[index]),
+                      isSelected: isContactSelected(contacts[index]),
                     ),
                   )
                 : SizedBox(),

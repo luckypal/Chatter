@@ -10,7 +10,7 @@ import 'package:chatter/src/widgets/ContactWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
-import 'package:chatter/src/services/contact.dart';
+import 'package:chatter/src/services/phone_contact.dart';
 import 'package:share/share.dart';
 // import 'package:intent/intent.dart' as AndroidIntent1;
 import 'package:intent/action.dart' as AndroidIntentActions;
@@ -23,23 +23,36 @@ class ContactsPage extends StatefulWidget {
 
 class _ContactsPageState extends State<ContactsPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  ContactService contactService;
+  PhoneContactService contactService;
+  List<BaseContact> contacts;
+  String searchText = "";
 
   @override
   void initState() {
     super.initState();
-    contactService = locator<ContactService>();
+    contactService = locator<PhoneContactService>();
+    
     if (contactService.model == null)
       new Future.delayed(const Duration(milliseconds: 100), initContact);
+    else
+      contacts = contactService.model;
   }
 
   void initContact() async {
-    contactService = locator<ContactService>();
+    contactService = locator<PhoneContactService>();
     UI.showSpinnerOverlay(context);
     await contactService.load();
     UI.closeSpinnerOverlay(context);
     setState(() {
       this.contactService = contactService;
+      this.contacts = contactService.model;
+    });
+  }
+
+  void onChangedSearchText(String value) {
+    setState(() {
+      searchText = value;
+      contacts = contactService.filterContacts(value);
     });
   }
 
@@ -68,7 +81,7 @@ class _ContactsPageState extends State<ContactsPage> {
   void onContactPressed(BaseContact contact) {
     List<BaseContact> contacts = new List<BaseContact>();
     contacts.add(contact);
-    Navigator.pushNamed(context, "/Chat", arguments: {
+    Navigator.popAndPushNamed(context, "/Chat", arguments: {
       "name": null,
       "contacts": contacts,
     });
@@ -116,7 +129,9 @@ class _ContactsPageState extends State<ContactsPage> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: SearchBarWidget(),
+              child: SearchBarWidget(
+                onChanged: onChangedSearchText,
+              ),
             ),
             SizedBox(height: 5),
             functionBuilder(
@@ -129,7 +144,7 @@ class _ContactsPageState extends State<ContactsPage> {
                 title: "New Contact",
                 onPressed: onNewContact,
                 color: Theme.of(context).accentColor),
-            contactService.model != null
+            contacts != null
                 ? ListView.separated(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
@@ -137,11 +152,11 @@ class _ContactsPageState extends State<ContactsPage> {
                     separatorBuilder: (context, index) {
                       return SizedBox(height: 0);
                     },
-                    itemCount: contactService.model.length,
+                    itemCount: contacts.length,
                     itemBuilder: (context, index) => ContactWidget(
-                        contact: contactService.model[index],
-                        onPressed: () =>
-                            onContactPressed(contactService.model[index])),
+                      contact: contacts[index],
+                      onPressed: () => onContactPressed(contacts[index]),
+                    ),
                   )
                 : SizedBox(),
             functionBuilder(
