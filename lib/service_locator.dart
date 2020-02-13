@@ -3,7 +3,6 @@ import 'package:chatter/src/services/phone_verify.dart';
 import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/services/user/chatter.dart';
 import 'package:chatter/src/services/server.dart';
-import 'package:chatter/src/services/phone_contact.dart';
 
 GetIt locator = GetIt.instance;
 
@@ -12,5 +11,4 @@ setupServiceLocator() {
   locator.registerLazySingleton<OwnerUserService>(() => OwnerUserServiceImpl());
   locator.registerLazySingleton<ChatterUserService>(() => ChatterUserServiceImpl());
   locator.registerLazySingleton<ServerService>(() => ServerServiceImpl());
-  locator.registerLazySingleton<PhoneContactService>(() => PhoneContactServiceImpl());
 }

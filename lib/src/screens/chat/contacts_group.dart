@@ -7,7 +7,7 @@ import 'package:chatter/src/widgets/ContactWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
-import 'package:chatter/src/services/phone_contact.dart';
+import 'package:chatter/src/services/user/chatter.dart';
 
 class ContactsGroupPage extends StatefulWidget {
   final List<UserModel> selectedContacts;
@@ -20,7 +20,7 @@ class ContactsGroupPage extends StatefulWidget {
 
 class _ContactsGroupPageState extends State<ContactsGroupPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  PhoneContactService contactService;
+  ChatterUserService chatterUserService;
   List<UserModel> contacts;
   List<UserModel> selectedContacts;
   String searchText = "";
@@ -28,8 +28,8 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
   @override
   void initState() {
     super.initState();
-    contactService = locator<PhoneContactService>();
-    contacts = contactService.model;
+    chatterUserService = locator<ChatterUserService>();
+    contacts = chatterUserService.models;
 
     if (widget.selectedContacts != null)
       selectedContacts = widget.selectedContacts;
@@ -65,7 +65,7 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
   void onChangedSearchText(String value) {
     setState(() {
       searchText = value;
-      contacts = contactService.filterContacts(value);
+      contacts = chatterUserService.findContacts(value);
     });
   }
 

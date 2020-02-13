@@ -3,6 +3,7 @@ import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/services/user/chatter.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -10,7 +11,6 @@ import 'package:chatter/src/widgets/ContactWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
-import 'package:chatter/src/services/phone_contact.dart';
 import 'package:share/share.dart';
 // import 'package:intent/intent.dart' as AndroidIntent;
 import 'package:intent/action.dart' as AndroidIntentActions;
@@ -23,36 +23,38 @@ class ContactsPage extends StatefulWidget {
 
 class _ContactsPageState extends State<ContactsPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  PhoneContactService contactService;
+  ChatterUserService chatterUserService;
   List<UserModel> contacts;
   String searchText = "";
 
   @override
   void initState() {
     super.initState();
-    contactService = locator<PhoneContactService>();
+    chatterUserService = locator<ChatterUserService>();
 
-    if (contactService.model == null)
+    contacts = List<UserModel>();
+
+    if (chatterUserService.models == null)
       new Future.delayed(const Duration(milliseconds: 100), initContact);
     else
-      contacts = contactService.model;
+      contacts.addAll(chatterUserService.models);
   }
 
   void initContact() async {
-    contactService = locator<PhoneContactService>();
+    chatterUserService = locator<ChatterUserService>();
     UI.showSpinnerOverlay(context);
-    await contactService.load();
+    await chatterUserService.load();
     UI.closeSpinnerOverlay(context);
     setState(() {
-      this.contactService = contactService;
-      this.contacts = contactService.model;
+      this.chatterUserService = chatterUserService;
+      contacts.addAll(chatterUserService.models);
     });
   }
 
   void onChangedSearchText(String value) {
     setState(() {
       searchText = value;
-      contacts = contactService.filterContacts(value);
+      contacts = chatterUserService.findContacts(value);
     });
   }
 
@@ -62,13 +64,6 @@ class _ContactsPageState extends State<ContactsPage> {
 
   void onNewContact() async {
     if (Platform.isAndroid) {
-      // AndroidIntent.Intent()
-      //   ..setAction(AndroidIntentAction.Action.ACTION_INSERT)
-      //   ..setData(Uri.parse('content://contacts'))
-      //   ..setType("vnd.android.cursor.dir/contact")
-      //   ..startActivityForResult().then((List<String> value) {
-      //     if (value.length != 0) initContact();
-      //   });
       AndroidIntent intent = AndroidIntent(
         action: AndroidIntentActions.Action.ACTION_INSERT,
         data: 'content://contacts',
