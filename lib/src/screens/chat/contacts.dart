@@ -66,7 +66,12 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   void onContactPressed(BaseContact contact) {
-    Navigator.pushNamed(context, "/Chat", arguments: contact);
+    List<BaseContact> contacts = new List<BaseContact>();
+    contacts.add(contact);
+    Navigator.pushNamed(context, "/Chat", arguments: {
+      "name": null,
+      "contacts": contacts,
+    });
   }
 
   void onInviteFriend() {

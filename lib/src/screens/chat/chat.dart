@@ -20,8 +20,10 @@ class Choice {
 }
 
 class ChatPage extends StatefulWidget {
-  final ChatterContact contact;
-  const ChatPage({Key key, this.contact}) : super(key: key);
+  final String name;
+  final List<BaseContact> contacts;
+
+  const ChatPage({Key key, this.name, this.contacts}) : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -62,16 +64,7 @@ class _ChatPageState extends State<ChatPage> {
     if (choice.icon == Icons.contacts) {
       //Show contact
       if (Platform.isAndroid) {
-        String identifier = widget.contact.contact.identifier;
-        // AndroidIntent.Intent()
-        //   ..setAction(AndroidIntentAction.Action.ACTION_EDIT)   //ACTION_INSERT_OR_EDIT
-        //   ..setData(Uri.parse('content://contacts/people/$identifier'))
-        //   // ..setType("vnd.android.cursor.item/contact")
-        //   ..startActivityForResult().then((dynamic value) {
-        //     print("Done");
-        //   }).catchError((error) {
-        //     print("Error");
-        //   });
+        String identifier = widget.contacts[0].contact.identifier;
 
         AndroidIntent intent = AndroidIntent(
           action: AndroidIntentActions.Action.ACTION_EDIT,
@@ -82,6 +75,71 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
     setState(() {});
+  }
+
+  Widget buildTitleWidget() {
+    if (widget.contacts.length == 1) {
+      BaseContact contact = widget.contacts[0];
+      return Row(
+        children: [
+          CircleAvatar(
+              backgroundImage: Image.network(contact.userModel.photoUrl).image),
+          SizedBox(width: 15),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                contact.name,
+                style: Theme.of(context).textTheme.display1,
+              ),
+              Text("Last seen at yesterday.",
+                  style: Theme.of(context).textTheme.body1),
+            ],
+          ),
+        ],
+      );
+    } else {
+      List<Widget> contactWidgets = List<Widget>();
+      widget.contacts.forEach((contact) {
+        contactWidgets.add(
+          Row(children: [
+            SizedBox(
+              width: 15,
+              height: 15,
+              child: CircleAvatar(
+                backgroundImage:
+                    Image.network(contact.userModel.photoUrl).image,
+              ),
+            ),
+            Text(
+              contact.name,
+              style: Theme.of(context).textTheme.body1,
+            ),
+            SizedBox(
+              width: 7,
+            )
+          ]),
+        );
+      });
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            widget.name,
+            style: Theme.of(context).textTheme.display1,
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: contactWidgets,
+            ),
+          ),
+          // Text("Last seen at yesterday.",
+          //     style: Theme.of(context).textTheme.body1),
+        ],
+      );
+    }
   }
 
   @override
@@ -100,25 +158,7 @@ class _ChatPageState extends State<ChatPage> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Row(
-          children: [
-            CircleAvatar(
-                backgroundImage:
-                    Image.network(widget.contact.userModel.photoUrl).image),
-            SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.contact.name,
-                  style: Theme.of(context).textTheme.display1,
-                ),
-                Text("Last seen at yesterday.",
-                    style: Theme.of(context).textTheme.body1),
-              ],
-            ),
-          ],
-        ),
+        title: buildTitleWidget(),
         actions: <Widget>[
           // new IconButton(
           //   icon: new Icon(choices[0].icon, color: Theme.of(context).hintColor),

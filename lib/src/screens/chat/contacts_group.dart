@@ -41,8 +41,23 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
       selectedContacts = new List<BaseContact>();
   }
 
-  void onCreateGroup() async {
-    // Navigator.pushNamed(context, "/Chat", arguments: selectedContacts);
+  void onCreateGroup() {
+    if (selectedContacts.length == 1) {
+      Navigator.pushNamed(context, "/Chat", arguments: {
+        "name": null,
+        "contacts": selectedContacts,
+      });
+    } else
+      UI.showPrompt(
+        context,
+        label: "Group chat name",
+        onResult: (bool result, String value) {
+          Navigator.pushNamed(context, "/Chat", arguments: {
+            "name": value,
+            "contacts": selectedContacts,
+          });
+        },
+      );
   }
 
   int getContactIndex(BaseContact contact) {
