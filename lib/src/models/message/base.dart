@@ -1,21 +1,37 @@
-import 'package:chatter/src/models/user/base.dart';
+class MessageType {
+  static const int TEXT = 0;
+}
 
 abstract class MessageModel {
   String _id;
-  UserModel _sender;
-  List<UserModel> _receivers;
+  String _conversationId;
+  String _senderId;
+  int _platform;
+  String _message;
+  int _messageType;
   int _sentTime;
 
   String get identifier => _id;
-  UserModel get sender => _sender;
-  List<UserModel> get receivers => _receivers;
-  int get platform => _sender.platform;
+  
+  String get conversationId => _conversationId;
+  set conversationId(value) => _conversationId = value;
+
+  String get senderId => _senderId;
+  int get platform => _platform;
+  String get message => _message;
+  int get messageType => _messageType;
   int get sentTime => _sentTime;
 
-  MessageModel({String id, UserModel sender, List<UserModel> receivers, int sentTime}) {
-    _id = id;
-    _sender = sender;
-    _receivers = receivers;
+  MessageModel();
+
+  MessageModel.create(String id, String conversationId, String senderId, int platform, String message, int messageType, int sentTime):
+    _id = id,
+    _conversationId = conversationId,
+    _senderId = senderId,
+    _platform = platform,
+    _message = message,
+    _messageType = messageType,
     _sentTime = sentTime;
-  }
+
+  Future<String> save();
 }

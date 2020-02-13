@@ -2,8 +2,8 @@ enum UserState { available, away, busy }
 
 class UserPlatform {
   //chatter, facebook / instagram / ...
-  static final int chatter = 0;
-  static final int facebook = 1;
+  static const int chatter = 0;
+  static const int facebook = 1;
   // ...
 }
 

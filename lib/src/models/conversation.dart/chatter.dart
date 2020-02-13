@@ -1,8 +1,5 @@
 import 'package:chatter/src/models/conversation.dart/base.dart';
-import 'package:chatter/src/models/user/base.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:country_code_picker/country_code.dart';
-import 'package:contacts_service/contacts_service.dart';
 
 class ChatterConversationModel extends ConversationModel {
   String _title;
@@ -10,9 +7,13 @@ class ChatterConversationModel extends ConversationModel {
 
   ChatterConversationModel();
 
-  // static ChatterConversationModel createConversation({String title, List<UserModel> users}) {
-  //   ChatterConversationModel model = new ChatterConversationModel();
+  static ChatterConversationModel fromDocument(DocumentSnapshot item) {
+    ChatterConversationModel model = ChatterConversationModel();
+    model.loadFromDoc(item);
+    return model;
+  }
+  
+  void loadFromDoc(DocumentSnapshot item) {
 
-  //   return model;
-  // }
+  }
 }

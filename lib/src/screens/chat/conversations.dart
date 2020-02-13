@@ -1,13 +1,13 @@
 import 'package:chatter/config/text.dart';
+import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
-import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:chatter/src/notifiers/conversation.dart';
 
 class ConversationsWidget extends StatefulWidget {
   @override
@@ -16,7 +16,7 @@ class ConversationsWidget extends StatefulWidget {
 
 class _ConversationsWidgetState extends State<ConversationsWidget>
     with SingleTickerProviderStateMixin {
-  ConversationNotifier conversationNotifier;
+  MultiConversationService conversationService;
   bool isAccessContacts = false;
   bool isHasContacts = true;
 
@@ -25,7 +25,11 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
     super.initState();
 
     checkPermission();
-    conversationNotifier = Provider.of<ConversationNotifier>(context, listen: false);
+
+    conversationService = locator<MultiConversationService>();
+    conversationService.addListener(() {
+      print("conversationService add Listener");
+    });
   }
 
   void checkPermission() async {
