@@ -44,6 +44,12 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
       selectedContacts = new List<BaseContact>();
   }
 
+  void onDeselectAll() {
+    setState(() {
+      selectedContacts = new List<BaseContact>();
+    });
+  }
+
   void onCreateGroup() {
     if (selectedContacts.length == 1) {
       Navigator.popAndPushNamed(context, "/Chat", arguments: {
@@ -116,6 +122,11 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
           style: Theme.of(context).textTheme.display1,
         ),
         actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.check_box_outline_blank, color: Theme.of(context).hintColor),
+            onPressed: isSelectedContact ? onDeselectAll : null,
+            tooltip: "Deselect all",
+          ),
           new IconButton(
             icon: new Icon(Icons.check, color: Theme.of(context).hintColor),
             onPressed: isSelectedContact ? onCreateGroup : null,

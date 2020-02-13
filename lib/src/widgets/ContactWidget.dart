@@ -33,15 +33,6 @@ class _ContactWidgetState extends State<ContactWidget> {
       elevation: 0,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
-        decoration: BoxDecoration(
-          // color: Theme.of(context).primaryColor.withOpacity(0.9),
-          boxShadow: [
-            BoxShadow(
-                color: Theme.of(context).focusColor.withOpacity(0.1),
-                blurRadius: 5,
-                offset: Offset(0, 2)),
-          ],
-        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
