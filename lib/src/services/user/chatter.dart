@@ -7,8 +7,7 @@ import 'package:chatter/src/utils/utilities.dart';
 
 abstract class ChatterUserService extends BaseUserService {
   final Firestore firestore = Firestore.instance;
-  List<ChatterUserModel> _models;
-  List<ChatterUserModel> get models => _models;
+  List<ChatterUserModel> get models => super.models;
 
   ChatterUserService();
 }
@@ -19,7 +18,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
     return new Future<List<ChatterUserModel>>(() async {
       Iterable<Contact> contacts = await ContactsService.getContacts();
       await filterWithServer(contacts);
-      return _models;
+      return models;
     });
   }
 
@@ -70,7 +69,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
       });
 
       int start = 0;
-      _models = new List<ChatterUserModel>();
+      models = new List<ChatterUserModel>();
       List<String> phoneNumbers = contactTable.keys.toList(growable: false);
       // await serverService.findPhones(phoneNumbers);
 
@@ -83,7 +82,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
         userList.forEach((chatterUser) {
           chatterUser.contact = contactTable[chatterUser.phoneNumber];
 
-          _models.add(chatterUser);
+          models.add(chatterUser);
         });
 
         start += 10;

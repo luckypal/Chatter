@@ -1,5 +1,4 @@
-import 'package:chatter/src/models/phone_verify.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:chatter/src/notifiers/conversation.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/route_generator.dart';
@@ -14,7 +13,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => PhoneVerifyState()),
+        ChangeNotifierProvider(create: (context) => ConversationNotifier()),
       ],
       child: MyApp(),
     ),
