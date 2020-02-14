@@ -12,4 +12,5 @@ abstract class BaseConversationService {
 
   Future<ConversationModel> createConversation(String title, List<UserModel> receivers, int platform);
   Future<MessageModel> sendMessageModel(MessageModel msg);
+  void load();
 }

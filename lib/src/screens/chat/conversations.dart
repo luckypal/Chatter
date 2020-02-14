@@ -30,6 +30,8 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
     conversationService.addListener(() {
       print("conversationService add Listener");
     });
+
+    conversationService.load();
   }
 
   void checkPermission() async {

@@ -46,7 +46,7 @@ class MultiConversationServiceImpl extends MultiConversationService {
         ChatterMessageModel messageModel = ChatterMessageModel.create(
             ChatPlatform.chatter,
             conversationModel.identifier,
-            ownerUserService.model.identifier,
+            ownerUserService.identifier,
             message,
             messageType);
         return sendMessageModel(messageModel);
@@ -72,5 +72,10 @@ class MultiConversationServiceImpl extends MultiConversationService {
         return chatterConversationService.createConversation(title, receivers, ChatPlatform.chatter);
     }
     return null;
+  }
+
+  @override
+  void load() {
+    chatterConversationService.load();
   }
 }

@@ -11,13 +11,6 @@ import 'package:chatter/src/services/user/owner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class ConversationStatus {
-  static const int WAITING_ACCEPT = 0;
-  static const int ACCEPTED = 1;
-  static const int BLOCKED = 2;
-  static const int DELETED = 3;
-}
-
 /**
  * conversationHeaders: Object {
  *  userId: Object {
@@ -38,9 +31,6 @@ class ConversationStatus {
  */
 abstract class ChatterConversationService extends BaseConversationService
     with ChangeNotifier {
-  static const String COLLECTION_HEADER_NAME = "conversationHeaders";
-  static const String COLLECTION_NAME = "conversations";
-
   OwnerUserService ownerUserService;
   MultiConversationService multiConversationService;
 
@@ -53,26 +43,9 @@ abstract class ChatterConversationService extends BaseConversationService
     ownerUserService = locator<OwnerUserService>();
     multiConversationService = locator<MultiConversationService>();
   }
-
-  void load();
 }
 
 class ChatterConversationServiceImpl extends ChatterConversationService {
-  @override
-  void load() async {
-    String userIdentifier = ownerUserService.model.identifier;
-
-    Stream<QuerySnapshot> queryStream = firestore
-        .collection(
-            '${ChatterConversationService.COLLECTION_HEADER_NAME}/$userIdentifier')
-        .snapshots();
-    queryStream.listen((QuerySnapshot snapshot) {
-      List<DocumentSnapshot> list = snapshot.documents;
-      updateModel(list);
-
-      multiConversationService.onUpdate(ChatPlatform.chatter);
-    });
-  }
 
   updateModel(List<DocumentSnapshot> list) {
     List<ChatterConversationModel> temp = new List<ChatterConversationModel>();
@@ -80,6 +53,12 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       // temp.add(ChatterConversationModel.fromDocument(item));
     });
   }
+
+  // DocumentReference getCollection(String conversationId) {
+  //   return firestore
+  //       .collection(ChatterConversationModel.COLLECTION_NAME)
+  //       .document(conversationId);
+  // }
 
   @override
   Future<MessageModel> sendMessageModel(MessageModel msg) {
@@ -91,36 +70,58 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
     });
   }
 
-  CollectionReference getHeaderCollection(String userIdentifier) {
-    return firestore
-        .collection(ChatterUserService.COLLECTION_NAME)
-        .document(userIdentifier)
-        .collection(ChatterConversationService.COLLECTION_HEADER_NAME);
-  }
-
   @override
-  Future<ConversationModel> createConversation(String title, List<UserModel> receivers, int platform) {
+  Future<ConversationModel> createConversation(
+      String title, List<UserModel> receivers, int platform) {
     return new Future<ConversationModel>(() async {
-      String userIdentifier = ownerUserService.model.identifier;
+      String userIdentifier = ownerUserService.identifier;
       List<String> userIds = new List<String>();
       userIds.add(userIdentifier);
 
-      DocumentReference mineRef = await getHeaderCollection(userIdentifier)
-          .add({"status": ConversationStatus.ACCEPTED, "unread": 0});
-      String conversationId = mineRef.documentID;
+      ChatterConversationHeaderModel headerModel = ChatterConversationHeaderModel.create(
+          userIdentifier: userIdentifier,
+          conversationId: null,
+          status: ConversationStatus.ACCEPTED,
+          unreadMessageCount: 0);
+      headerModel.save();
+
+      String conversationId = headerModel.conversationId;
 
       receivers.forEach((user) {
         String identifier = user.identifier;
         userIds.add(identifier);
-        getHeaderCollection(identifier).document(conversationId).setData(
-            {"status": ConversationStatus.WAITING_ACCEPT, "unread": 1});
+        
+        ChatterConversationHeaderModel otherHeaderModel = ChatterConversationHeaderModel.create(
+            userIdentifier: userIdentifier,
+            conversationId: conversationId,
+            status: ConversationStatus.WAITING_ACCEPT,
+            unreadMessageCount: 0);
+        otherHeaderModel.save();
       });
 
       int createdTime = DateTime.now().millisecondsSinceEpoch;
-      ConversationModel conversationModel = ChatterConversationModel.create(conversationId, title, userIds, createdTime);
+      ConversationModel conversationModel = ChatterConversationModel.create(
+          conversationId, title, userIds, createdTime);
       conversationModel.save();
 
       return conversationModel;
+    });
+  }
+  
+  @override
+  void load() {
+    String userIdentifier = ownerUserService.identifier;
+
+    ChatterConversationHeaderModel.getCollection(userIdentifier)
+        .snapshots()
+        .listen((QuerySnapshot snapshot) {
+      List<DocumentSnapshot> list = snapshot.documents;
+      list.forEach((headerDoc) async {
+        String conversationId = headerDoc.documentID;
+        ChatterConversationModel conversationModel = await ChatterConversationModel.loadFromConversationId(conversationId: conversationId);
+      });
+
+      multiConversationService.onUpdate(ChatPlatform.chatter);
     });
   }
 }

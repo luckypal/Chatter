@@ -17,6 +17,8 @@ abstract class OwnerUserService {
   ChatterUserModel _model;
   ChatterUserModel get model => _model;
 
+  String get identifier => _model.identifier;
+
   CountryCode countryCode;
 
   OwnerUserService();
