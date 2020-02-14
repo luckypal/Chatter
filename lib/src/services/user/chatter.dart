@@ -39,6 +39,16 @@ class ChatterUserServiceImpl extends ChatterUserService {
   }
 
   @override
+  Future<ChatterUserModel> findUserByIdentifier(String identifier) async {
+    ChatterUserModel model = await super.findUserByIdentifier(identifier);
+
+    if (model != null) return model;
+    
+    DocumentSnapshot doc = await firestore.collection(ChatterUserService.COLLECTION_NAME).document(identifier).get();
+    return ChatterUserModel(doc: doc);
+  }
+
+  @override
   Future<List<ChatterUserModel>> findUsersByPhoneNumber({List<String> phoneNumbers}) {
     return new Future<List<ChatterUserModel>>(() async {
       List<ChatterUserModel> users = new List<ChatterUserModel>();

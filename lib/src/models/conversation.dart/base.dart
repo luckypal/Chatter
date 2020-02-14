@@ -3,9 +3,12 @@ import 'package:chatter/src/models/user/base.dart';
 abstract class ConversationModel {
   String _identifier;
   String _title;
-  List<String> _users;
+  List<String> _userIds;
   int _platform;
   int _createdTime;
+
+  String photoUrl;
+  List<UserModel> userModel;
 
   String get identifier => _identifier;
   set identifier(value) => _identifier = value;
@@ -13,8 +16,8 @@ abstract class ConversationModel {
   String get title => _title;
   set title(value) => _title = value;
 
-  List<String> get userIds => _users;
-  set userIds(value) => _users = value;
+  List<String> get userIds => _userIds;
+  set userIds(value) => _userIds = value;
 
   int get platform => _platform;
   set platform(value) => _platform = value;
@@ -25,10 +28,10 @@ abstract class ConversationModel {
   ConversationModel();
 
   ConversationModel.create(
-      String identifier, String title, List<String> users, int platform, int createdTime)
+      String identifier, String title, List<String> userIds, int platform, int createdTime)
       : this._identifier = identifier,
         this._title = title,
-        this._users = users,
+        this._userIds = userIds,
         this._platform = platform,
         this._createdTime = createdTime;
   

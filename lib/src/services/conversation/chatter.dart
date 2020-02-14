@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/conversation.dart/chatter.dart';
@@ -107,7 +109,7 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       return conversationModel;
     });
   }
-  
+
   @override
   void load() {
     String userIdentifier = ownerUserService.identifier;

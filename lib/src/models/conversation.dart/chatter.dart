@@ -1,7 +1,10 @@
+import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/models/user/chatter.dart';
 import 'package:chatter/src/services/conversation/chatter.dart';
 import 'package:chatter/src/services/user/chatter.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ConversationStatus {
@@ -94,13 +97,33 @@ class ChatterConversationModel extends ConversationModel {
       {String conversationId}) {
     return new Future<ChatterConversationModel>(() async {
       Map<String, dynamic> data = (await getDocument(conversationId).get()).data;
+      List<String> userIds = new List<String>();
+      data["userIds"].forEach((userId) {
+        userIds.add(userId);
+      });
+      // userIds.addAll(data["userIds"]);
 
-      return ChatterConversationModel.create(
+      ChatterConversationModel conversationModel = ChatterConversationModel.create(
         conversationId,
         data["title"],
-        data["users"],
+        userIds,
         data["createdTime"]
       );
+
+      if (conversationModel.userIds.length == 2) { //One-to-one chat
+        OwnerUserService ownerUserService = locator<OwnerUserService>();
+        int otherUserIndex = conversationModel.userIds [0] == ownerUserService.identifier ? 1 : 0;
+        String otherUserId = conversationModel.userIds [otherUserIndex];
+
+        ChatterUserService userService = locator<ChatterUserService>();
+        ChatterUserModel otherUserModel = await userService.findUserByIdentifier(otherUserId);
+
+        conversationModel.photoUrl = otherUserModel.photoUrl;
+        conversationModel.userModel = new List<ChatterUserModel>();
+        conversationModel.userModel.add(otherUserModel);
+      }
+
+      return conversationModel;
     });
   }
   /*static ChatterConversationModel fromDocument(DocumentSnapshot item) {

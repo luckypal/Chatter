@@ -5,15 +5,18 @@ import 'package:chatter/src/models/message/chatter.dart';
 import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/services/conversation/base.dart';
 import 'package:chatter/src/services/conversation/chatter.dart';
+import 'package:chatter/src/services/user/chatter.dart';
 import 'package:chatter/src/services/user/owner.dart';
 import 'package:flutter/material.dart';
 
 abstract class MultiConversationService extends BaseConversationService
     with ChangeNotifier {
   OwnerUserService ownerUserService;
+  ChatterUserService chatterUserService;
   ChatterConversationService chatterConversationService;
 
   MultiConversationService() {
+    chatterUserService = locator<ChatterUserService>();
     chatterConversationService = locator<ChatterConversationService>();
     chatterConversationService.addListener(onEvent(ChatPlatform.chatter));
 
@@ -76,6 +79,8 @@ class MultiConversationServiceImpl extends MultiConversationService {
 
   @override
   void load() {
-    chatterConversationService.load();
+    chatterUserService.load().then((_) {
+      chatterConversationService.load();
+    });
   }
 }
