@@ -10,6 +10,7 @@ import 'package:chatter/src/services/conversation/base.dart';
 import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/services/user/chatter.dart';
 import 'package:chatter/src/services/user/owner.dart';
+import 'package:chatter/src/widgets/MessageWidget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +49,6 @@ abstract class ChatterConversationService extends BaseConversationService
 }
 
 class ChatterConversationServiceImpl extends ChatterConversationService {
-
   updateModel(List<DocumentSnapshot> list) {
     List<ChatterConversationModel> temp = new List<ChatterConversationModel>();
     list.forEach((DocumentSnapshot item) {
@@ -80,11 +80,12 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       List<String> userIds = new List<String>();
       userIds.add(userIdentifier);
 
-      ChatterConversationHeaderModel headerModel = ChatterConversationHeaderModel.create(
-          userIdentifier: userIdentifier,
-          conversationId: null,
-          status: ConversationStatus.ACCEPTED,
-          unreadMessageCount: 0);
+      ChatterConversationHeaderModel headerModel =
+          ChatterConversationHeaderModel.create(
+              userIdentifier: userIdentifier,
+              conversationId: null,
+              status: ConversationStatus.ACCEPTED,
+              unreadMessageCount: 0);
       headerModel.save();
 
       String conversationId = headerModel.conversationId;
@@ -92,12 +93,13 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       receivers.forEach((user) {
         String identifier = user.identifier;
         userIds.add(identifier);
-        
-        ChatterConversationHeaderModel otherHeaderModel = ChatterConversationHeaderModel.create(
-            userIdentifier: userIdentifier,
-            conversationId: conversationId,
-            status: ConversationStatus.WAITING_ACCEPT,
-            unreadMessageCount: 0);
+
+        ChatterConversationHeaderModel otherHeaderModel =
+            ChatterConversationHeaderModel.create(
+                userIdentifier: userIdentifier,
+                conversationId: conversationId,
+                status: ConversationStatus.WAITING_ACCEPT,
+                unreadMessageCount: 0);
         otherHeaderModel.save();
       });
 
@@ -121,12 +123,16 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       models.clear();
 
       List<DocumentSnapshot> list = snapshot.documents;
-      for (int index = 0; index < list.length; index ++) {
-        DocumentSnapshot headerDoc = list [index];
+      for (int index = 0; index < list.length; index++) {
+        DocumentSnapshot headerDoc = list[index];
         String conversationId = headerDoc.documentID;
 
-        ChatterConversationHeaderModel headerModel = await ChatterConversationHeaderModel.loadFromConversationId(userIdentifier, conversationId);
-        ChatterConversationModel conversationModel = await ChatterConversationModel.loadFromConversationId(conversationId: conversationId);
+        ChatterConversationHeaderModel headerModel =
+            await ChatterConversationHeaderModel.loadFromConversationId(
+                userIdentifier, conversationId);
+        ChatterConversationModel conversationModel =
+            await ChatterConversationModel.loadFromConversationId(
+                conversationId: conversationId);
         conversationModel.headerModel = headerModel;
 
         models.add(conversationModel);
@@ -135,34 +141,48 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       multiConversationService.onUpdate(ChatPlatform.chatter);
     });
   }
-  
+
   @override
-  StreamBuilder streamBuilder({GlobalKey<AnimatedListState> key, ConversationModel conversationModel}) {
+  StreamBuilder streamBuilder(
+      {GlobalKey<AnimatedListState> key, ConversationModel conversationModel}) {
     String conversationId = conversationModel.identifier;
 
-    return StreamBuilder(
-      stream: ChatterMessageModel.getMessageCollection(conversationId).snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        if (!snapshot.hasData) {
-          return Container();
-        } else {
-          List<DocumentSnapshot> documents = snapshot.data.documents;
-          return AnimatedList(
+    return StreamBuilder<QuerySnapshot>(
+        stream: ChatterMessageModel.getMessageCollection(conversationId).orderBy("sentTime", descending: true)
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          } else {
+            /*
+            List<DocumentSnapshot> documents = snapshot.data.documents;
+            return AnimatedList(
             key: key,
             reverse: true,
             padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
             initialItemCount: documents.length,
             itemBuilder: (context, index, Animation<double> animation) {
               ChatterMessageModel messageModel = ChatterMessageModel.createFromDocument(documents [index], conversationId);
-              return Text(messageModel.message);
-              // return ChatMessageListItem(
-              //   model: messageModel,
-              //   animation: animation,
-              // );
+              return MessageWidget(
+                model: messageModel,
+                animation: animation,
+              );
             }
-          );
-        }
-      }
-    );
+          );*/
+            return new ListView(
+              reverse: true,
+              children:
+                  snapshot.data.documents.map((DocumentSnapshot document) {
+                ChatterMessageModel messageModel =
+                    ChatterMessageModel.createFromDocument(
+                        document, conversationId);
+                return new MessageWidget(
+                  model: messageModel,
+                  animation: null,
+                );
+              }).toList(),
+            );
+          }
+        });
   }
 }

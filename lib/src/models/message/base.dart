@@ -2,6 +2,12 @@ class MessageType {
   static const int TEXT = 0;
 }
 
+enum MessageStatus {
+  waiting,
+  sent,
+  received
+}
+
 abstract class MessageModel {
   String _id;
   String _conversationId;
