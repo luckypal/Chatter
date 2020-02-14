@@ -1,4 +1,4 @@
-enum UserState { available, away, busy }
+enum UserState { available, away, busy, unknown }
 
 class ChatPlatform {
   //chatter, facebook / instagram / ...

@@ -25,6 +25,18 @@ abstract class ConversationModel {
   int get createdTime => _createdTime;
   set createdTime(value) => _createdTime = value;
 
+  int get unreadMessageCount => 0;
+  bool get hasUnreadMessage => false;
+
+  bool get hasLastMessage => true;
+  String get lastMessage => "";
+
+  UserState get userState => isSingleChat ? userModel [0].userState : UserState.unknown;
+
+  bool get isSingleChat => (_userIds != null && _userIds.length == 2);
+
+  bool get isGroupChat => (_userIds != null && _userIds.length != 2);
+
   ConversationModel();
 
   ConversationModel.create(

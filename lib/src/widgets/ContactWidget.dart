@@ -26,13 +26,13 @@ class _ContactWidgetState extends State<ContactWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-      color: widget.isSelected ? Theme.of(context).focusColor.withOpacity(0.2) : null,
-      onPressed: widget.onPressed,
+    return InkWell(
+      onTap: widget.onPressed,
       onLongPress: widget.onLongPressed,
-      elevation: 0,
+      // elevation: 0,
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+        color: widget.isSelected ? Theme.of(context).focusColor.withOpacity(0.2) : Colors.transparent,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[

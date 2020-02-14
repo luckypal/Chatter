@@ -88,14 +88,21 @@ class ChatterConversationHeaderModel {
 class ChatterConversationModel extends ConversationModel {
   static const String COLLECTION_NAME = "conversations";
 
-  String _title;
-  String get title => _title;
 
   ChatterConversationHeaderModel headerModel;
 
   final Firestore firestore = Firestore.instance;
 
   ChatterConversationModel();
+  
+  int get unreadMessageCount => headerModel.unreadMessageCount;
+  
+  bool get hasUnreadMessage => unreadMessageCount != 0;
+
+  String get title => userIds.length == 2 ? userModel[0].userName : super.title;
+  
+  bool get hasLastMessage => true;
+  String get lastMessage => "This is last message.";
 
   ChatterConversationModel.create(
       String identifier, String title, List<String> users, int createdTime)

@@ -21,7 +21,7 @@ abstract class MultiConversationService extends BaseConversationService
 
   MultiConversationService();
 
-  ConversationModel getModel(int index);
+  ConversationModel modelAt(int index);
   void onUpdate(int platform);
   Function onEvent(int platform) => () => onUpdate(platform);
 
@@ -42,7 +42,7 @@ class MultiConversationServiceImpl extends MultiConversationService {
     ownerUserService = locator<OwnerUserService>();
   }
 
-  ConversationModel getModel(int index) {
+  ConversationModel modelAt(int index) {
     return chatterConversationService.models [index];
   }
 

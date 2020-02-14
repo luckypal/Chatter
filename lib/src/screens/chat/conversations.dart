@@ -2,6 +2,7 @@ import 'package:chatter/config/text.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/utils/ui.dart';
+import 'package:chatter/src/widgets/ConversationWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/config/ui_icons.dart';
@@ -196,16 +197,17 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
                     return SizedBox(height: 7);
                   },
                   itemBuilder: (context, index) {
-                    return Text(
-                        '$index :  ${conversationService.getModel(index).photoUrl}');
-                    // return MessageItemWidget(
-                    //   message: _conversationList.conversations.elementAt(index),
-                    //   onDismissed: (conversation) {
-                    //     setState(() {
-                    //       _conversationList.conversations.removeAt(index);
-                    //     });
-                    //   },
-                    // );
+                    // return Text(
+                    //     '$index :  ${conversationService.getModel(index).photoUrl}');
+                    return ConversationWidget(
+                      model: conversationService.modelAt(index),
+                      onPressed: (conversation) {},
+                      onDismissed: (conversation) {
+                        setState(() {
+                          // _conversationList.conversations.removeAt(index);
+                        });
+                      },
+                    );
                   },
                 ),
               ],

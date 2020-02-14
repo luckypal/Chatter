@@ -51,6 +51,8 @@ dependencies:
   android_intent: ^0.3.5
   intent: ^1.1.0
 
+  badges: ^1.1.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
