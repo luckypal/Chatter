@@ -1,4 +1,5 @@
 import 'package:chatter/src/models/message/base.dart';
+import 'package:chatter/src/services/conversation/chatter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatterMessageModel extends MessageModel {
@@ -8,8 +9,10 @@ class ChatterMessageModel extends MessageModel {
 
   ChatterMessageModel();
 
-  ChatterMessageModel.create(int platform, String conversationId, String ownerId, String message, int messageType)
-      : super.create(null, conversationId, ownerId, platform, message, messageType, DateTime.now().millisecondsSinceEpoch);
+  ChatterMessageModel.create(int platform, String conversationId,
+      String ownerId, String message, int messageType)
+      : super.create(null, conversationId, ownerId, platform, message,
+            messageType, DateTime.now().millisecondsSinceEpoch);
 
   void loadFromDoc(DocumentSnapshot item) {}
 
@@ -17,7 +20,9 @@ class ChatterMessageModel extends MessageModel {
   Future<String> save() {
     return new Future<String>(() async {
       DocumentReference msgRef = await firestore
-          .collection("${ChatterMessageModel.COLLECTION_NAME}/$conversationId")
+          .collection(ChatterConversationService.COLLECTION_NAME)
+          .document(conversationId)
+          .collection(ChatterMessageModel.COLLECTION_NAME)
           .add({
         "sender": senderId,
         "message": message,

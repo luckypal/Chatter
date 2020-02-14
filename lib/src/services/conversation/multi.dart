@@ -1,4 +1,5 @@
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/message/base.dart';
 import 'package:chatter/src/models/message/chatter.dart';
 import 'package:chatter/src/models/user/base.dart';
@@ -14,7 +15,7 @@ abstract class MultiConversationService extends BaseConversationService
 
   MultiConversationService() {
     chatterConversationService = locator<ChatterConversationService>();
-    chatterConversationService.addListener(onEvent(UserPlatform.chatter));
+    chatterConversationService.addListener(onEvent(ChatPlatform.chatter));
 
     ownerUserService = locator<OwnerUserService>();
   }
@@ -25,8 +26,8 @@ abstract class MultiConversationService extends BaseConversationService
 
   void onUpdate(int platform);
 
-  Future<String> sendMessage(int platform, String conversationId,
-      List<UserModel> receivers, String message, int messageType);
+  Future<MessageModel> sendMessage(
+      ConversationModel conversationModel, String message, int messageType);
 }
 
 class MultiConversationServiceImpl extends MultiConversationService {
@@ -38,36 +39,38 @@ class MultiConversationServiceImpl extends MultiConversationService {
   }
 
   @override
-  Future<String> sendMessage(int platform, String conversationId,
-      List<UserModel> receivers, String message, int messageType) {
-    switch (platform) {
-      case UserPlatform.chatter:
+  Future<MessageModel> sendMessage(
+      ConversationModel conversationModel, String message, int messageType) {
+    switch (conversationModel.platform) {
+      case ChatPlatform.chatter:
         ChatterMessageModel messageModel = ChatterMessageModel.create(
-            platform,
-            conversationId,
+            ChatPlatform.chatter,
+            conversationModel.identifier,
             ownerUserService.model.identifier,
             message,
             messageType);
-        return sendMessageModel(messageModel, receivers);
+        return sendMessageModel(messageModel);
         break;
     }
     return null;
   }
 
   @override
-  Future<String> sendMessageModel(
-      MessageModel messageModel, List<UserModel> receivers) {
+  Future<MessageModel> sendMessageModel(MessageModel messageModel) {
     switch (messageModel.platform) {
-      case UserPlatform.chatter:
-        return chatterConversationService.sendMessageModel(
-            messageModel, receivers);
-        break;
+      case ChatPlatform.chatter:
+        return chatterConversationService.sendMessageModel(messageModel);
     }
 
     return null;
   }
 
   @override
-  Future<String> create(List<UserModel> receivers, MessageModel msg) =>
-      null; //Not Used
+  Future<ConversationModel> createConversation(String title, List<UserModel> receivers, int platform) {
+    switch (platform) {
+      case ChatPlatform.chatter:
+        return chatterConversationService.createConversation(title, receivers, ChatPlatform.chatter);
+    }
+    return null;
+  }
 }

@@ -1,18 +1,36 @@
 import 'package:chatter/src/models/user/base.dart';
 
 abstract class ConversationModel {
-  String _id;
-  List<UserModel> _users;
+  String _identifier;
+  String _title;
+  List<String> _users;
+  int _platform;
   int _createdTime;
 
-  String get identifier => _id;
-  List<UserModel> get users => _users;
-  int get platform => _users [0].platform;
-  int get createdTime => _createdTime;
+  String get identifier => _identifier;
+  set identifier(value) => _identifier = value;
 
-  ConversationModel({String id, List<UserModel> users, int createdTime}) {
-    _id = id;
-    _users = users;
-    _createdTime = createdTime;
-  }
+  String get title => _title;
+  set title(value) => _title = value;
+
+  List<String> get userIds => _users;
+  set userIds(value) => _users = value;
+
+  int get platform => _platform;
+  set platform(value) => _platform = value;
+
+  int get createdTime => _createdTime;
+  set createdTime(value) => _createdTime = value;
+
+  ConversationModel();
+
+  ConversationModel.create(
+      String identifier, String title, List<String> users, int platform, int createdTime)
+      : this._identifier = identifier,
+        this._title = title,
+        this._users = users,
+        this._platform = platform,
+        this._createdTime = createdTime;
+  
+  void save();
 }

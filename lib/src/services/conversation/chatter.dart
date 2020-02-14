@@ -1,10 +1,12 @@
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/conversation.dart/chatter.dart';
 import 'package:chatter/src/models/message/base.dart';
 import 'package:chatter/src/models/message/chatter.dart';
 import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/services/conversation/base.dart';
 import 'package:chatter/src/services/conversation/multi.dart';
+import 'package:chatter/src/services/user/chatter.dart';
 import 'package:chatter/src/services/user/owner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -68,86 +70,57 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       List<DocumentSnapshot> list = snapshot.documents;
       updateModel(list);
 
-      multiConversationService.onUpdate(UserPlatform.chatter);
+      multiConversationService.onUpdate(ChatPlatform.chatter);
     });
   }
 
   updateModel(List<DocumentSnapshot> list) {
     List<ChatterConversationModel> temp = new List<ChatterConversationModel>();
     list.forEach((DocumentSnapshot item) {
-      temp.add(ChatterConversationModel.fromDocument(item));
+      // temp.add(ChatterConversationModel.fromDocument(item));
     });
   }
 
   @override
-  Future<String> sendMessageModel(MessageModel msg, List<UserModel> receivers) {
-    return new Future<void>(() async {
+  Future<MessageModel> sendMessageModel(MessageModel msg) {
+    return new Future<MessageModel>(() async {
       ChatterMessageModel messageModel = msg;
-      // ChatterConversationModel chatterConvModel;
+      messageModel.save();
 
-      // if (messageModel.conversationId == null) {
-      //   models.forEach((ChatterConversationModel item) {
-      //     if (chatterConvModel != null) return;
-      //     if (item.identifier == messageModel.conversationId)
-      //       chatterConvModel = item;
-      //   });
-      // }
-
-      String conversationId = messageModel.conversationId;
-      if (conversationId == null) {
-        //Add Conversation to firebase conversation collection
-        conversationId = await create(receivers, messageModel);
-        messageModel.conversationId = conversationId;
-      } else {
-        //Process conversation item of database
-        conversationId = messageModel.conversationId;
-      }
-
-      await messageModel.save();
+      return messageModel;
     });
   }
 
+  CollectionReference getHeaderCollection(String userIdentifier) {
+    return firestore
+        .collection(ChatterUserService.COLLECTION_NAME)
+        .document(userIdentifier)
+        .collection(ChatterConversationService.COLLECTION_HEADER_NAME);
+  }
+
   @override
-  Future<String> create(List<UserModel> receivers, MessageModel msg) {
-    return new Future<String>(() async {
+  Future<ConversationModel> createConversation(String title, List<UserModel> receivers, int platform) {
+    return new Future<ConversationModel>(() async {
       String userIdentifier = ownerUserService.model.identifier;
-      ChatterMessageModel messageModel = msg;
-      String conversationId = messageModel.conversationId;
-      List<String> users = new List<String>();
-      users.add(userIdentifier);
+      List<String> userIds = new List<String>();
+      userIds.add(userIdentifier);
 
-      if (conversationId == null) {
-        DocumentReference mineRef = await firestore
-          .collection("${ChatterConversationService.COLLECTION_HEADER_NAME}/$userIdentifier")
-          .add({
-            "status": ConversationStatus.ACCEPTED,
-            "unread": 0
-        });
-        conversationId = mineRef.documentID;
-        messageModel.conversationId = conversationId;
+      DocumentReference mineRef = await getHeaderCollection(userIdentifier)
+          .add({"status": ConversationStatus.ACCEPTED, "unread": 0});
+      String conversationId = mineRef.documentID;
 
-        receivers.forEach((user) {
-          String identifier = user.identifier;
-          users.add(identifier);
-          firestore
-            .collection("${ChatterConversationService.COLLECTION_HEADER_NAME}/$identifier")
-            .document(conversationId)
-            .setData({
-              "status": ConversationStatus.WAITING_ACCEPT,
-              "unread": 1
-          });
-        });
-      }
-
-      firestore
-          .collection("${ChatterConversationService.COLLECTION_NAME}")
-          .document(conversationId)
-          .setData({
-        "users": users,
-        "createdAt": DateTime.now().millisecondsSinceEpoch
+      receivers.forEach((user) {
+        String identifier = user.identifier;
+        userIds.add(identifier);
+        getHeaderCollection(identifier).document(conversationId).setData(
+            {"status": ConversationStatus.WAITING_ACCEPT, "unread": 1});
       });
 
-      return conversationId;
+      int createdTime = DateTime.now().millisecondsSinceEpoch;
+      ConversationModel conversationModel = ChatterConversationModel.create(conversationId, title, userIds, createdTime);
+      conversationModel.save();
+
+      return conversationModel;
     });
   }
 }

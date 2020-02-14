@@ -2,10 +2,14 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:chatter/config/ui_icons.dart';
+import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/conversation.dart/base.dart';
+import 'package:chatter/src/models/message/base.dart';
 // import 'package:chatter/src/models/contact.dart';
 // import 'package:chatter/src/models/chat.dart';
 // import 'package:chatter/src/models/conversation.dart';
 import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/services/conversation/multi.dart';
 // import 'package:chatter/src/widgets/ChatMessageListItemWidget.dart';
 import 'package:flutter/material.dart';
 // import 'package:intent/intent.dart' as AndroidIntent;
@@ -20,18 +24,20 @@ class Choice {
 }
 
 class ChatPage extends StatefulWidget {
-  final String name;
+  final int platform;
+  final String title;
   final List<UserModel> contacts;
+  final ConversationModel model;
 
-  const ChatPage({Key key, this.name, this.contacts}) : super(key: key);
+  const ChatPage({Key key, this.platform, this.title, this.contacts, this.model})
+      : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  // ConversationsList _conversationList = new ConversationsList();
-  // User _currentUser = new User.init().getCurrentUser();
+  MultiConversationService multiConversationService;
 
   final List<Choice> choices = const <Choice>[
     const Choice(title: '', icon: Icons.videocam),
@@ -47,10 +53,13 @@ class _ChatPageState extends State<ChatPage> {
   final _myListKey = GlobalKey<AnimatedListState>();
   final myController = TextEditingController();
   final focusNode = new FocusNode();
+  ConversationModel conversationModel;
 
   @override
   void initState() {
     super.initState();
+    conversationModel = widget.model;
+    multiConversationService = locator<MultiConversationService>();
   }
 
   @override
@@ -77,13 +86,24 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {});
   }
 
+  void sendMessage(String message, int messageType) async {
+    if (conversationModel == null)
+      conversationModel = await multiConversationService.createConversation(widget.title, widget.contacts, widget.platform);
+
+    MessageModel messageModel = await multiConversationService.sendMessage(conversationModel, message, messageType);
+
+    Timer(Duration(milliseconds: 100), () {
+      myController.clear();
+      FocusScope.of(context).requestFocus(focusNode);
+    });
+  }
+
   Widget buildTitleWidget() {
     if (widget.contacts.length == 1) {
       UserModel contact = widget.contacts[0];
       return Row(
         children: [
-          CircleAvatar(
-              backgroundImage: Image.network(contact.photoUrl).image),
+          CircleAvatar(backgroundImage: Image.network(contact.photoUrl).image),
           SizedBox(width: 15),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,8 +127,7 @@ class _ChatPageState extends State<ChatPage> {
               width: 15,
               height: 15,
               child: CircleAvatar(
-                backgroundImage:
-                    Image.network(contact.photoUrl).image,
+                backgroundImage: Image.network(contact.photoUrl).image,
               ),
             ),
             Text(
@@ -126,7 +145,7 @@ class _ChatPageState extends State<ChatPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            widget.name,
+            widget.title,
             style: Theme.of(context).textTheme.display1,
           ),
           SingleChildScrollView(
@@ -140,6 +159,105 @@ class _ChatPageState extends State<ChatPage> {
         ],
       );
     }
+  }
+
+  Widget buildInputBox() {
+    return Container(
+      height: 50,
+      padding: EdgeInsets.all(3),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(50), color: Colors.transparent),
+      child: Row(
+        children: [
+          Expanded(
+            child: Material(
+              borderRadius: BorderRadius.circular(50),
+              color: Colors.white,
+              shadowColor: Theme.of(context).hintColor.withOpacity(0.30),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      // setState(() {
+                      //   _conversationList.conversations[0].chats
+                      //       .insert(0, new Chat(myController.text, '21min ago', _currentUser));
+                      //   _myListKey.currentState.insertItem(0);
+                      // });
+                      Timer(Duration(milliseconds: 100), () {
+                        myController.clear();
+                      });
+                    },
+                    icon: Icon(
+                      Icons.insert_emoticon,
+                      color: Theme.of(context).hintColor.withOpacity(0.6),
+                      size: 20,
+                    ),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: myController,
+                      focusNode: focusNode,
+                      onSubmitted: (String value) =>
+                          sendMessage(value, MessageType.TEXT),
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(vertical: 5),
+                        hintText: 'Chat text here',
+                        hintStyle: TextStyle(
+                          color: Theme.of(context).focusColor.withOpacity(0.8),
+                        ),
+                        border: new OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(40.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.all(0),
+                    onPressed: () {
+                      Timer(Duration(milliseconds: 100), () {
+                        myController.clear();
+                      });
+                    },
+                    icon: Icon(
+                      Icons.attach_file,
+                      color: Theme.of(context).hintColor.withOpacity(0.6),
+                      size: 25,
+                    ),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.all(0),
+                    onPressed: () {
+                      Timer(Duration(milliseconds: 100), () {
+                        myController.clear();
+                      });
+                    },
+                    icon: Icon(
+                      Icons.camera_alt,
+                      color: Theme.of(context).hintColor.withOpacity(0.6),
+                      size: 25,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          FloatingActionButton(
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            backgroundColor: Theme.of(context).accentColor,
+            elevation: 0,
+            onPressed: () => {},
+            child: Icon(
+              Icons.mic,
+              color: Colors.white,
+              size: 30,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -217,145 +335,7 @@ class _ChatPageState extends State<ChatPage> {
               },
             ),*/
                 ),
-            Container(
-              height: 50,
-              padding: EdgeInsets.all(3),
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(50),
-                  color: Colors.transparent
-                  // color: Theme.of(context).primaryColor,
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //       color: Theme.of(context).hintColor.withOpacity(0.10),
-                  //       offset: Offset(0, -4),
-                  //       blurRadius: 10)
-                  // ],
-                  ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Material(
-                      borderRadius: BorderRadius.circular(50),
-                      color: Colors.white,
-                      shadowColor:
-                          Theme.of(context).hintColor.withOpacity(0.30),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              // setState(() {
-                              //   _conversationList.conversations[0].chats
-                              //       .insert(0, new Chat(myController.text, '21min ago', _currentUser));
-                              //   _myListKey.currentState.insertItem(0);
-                              // });
-                              Timer(Duration(milliseconds: 100), () {
-                                myController.clear();
-                              });
-                            },
-                            icon: Icon(
-                              Icons.insert_emoticon,
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.6),
-                              size: 20,
-                            ),
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: myController,
-                              focusNode: focusNode,
-                              onSubmitted: (String value) {
-                                Timer(Duration(milliseconds: 100), () {
-                                  myController.clear();
-                                  FocusScope.of(context)
-                                      .requestFocus(focusNode);
-                                });
-                              },
-                              decoration: InputDecoration(
-                                contentPadding:
-                                    EdgeInsets.symmetric(vertical: 5),
-                                hintText: 'Chat text here',
-                                hintStyle: TextStyle(
-                                    color: Theme.of(context)
-                                        .focusColor
-                                        .withOpacity(0.8)),
-                                /*
-                              suffixIcon: IconButton(
-                                onPressed: () {
-                                  // setState(() {
-                                  //   _conversationList.conversations[0].chats
-                                  //       .insert(0, new Chat(myController.text, '21min ago', _currentUser));
-                                  //   _myListKey.currentState.insertItem(0);
-                                  // });
-                                  Timer(Duration(milliseconds: 100), () {
-                                    myController.clear();
-                                  });
-                                },
-                                icon: Icon(
-                                  Icons.attach_file,
-                                  color: Theme.of(context).accentColor,
-                                  size: 20,
-                                ),
-                              ),*/
-                                // border: UnderlineInputBorder(borderSide: BorderSide.none),
-                                // enabledBorder:
-                                //     UnderlineInputBorder(borderSide: BorderSide.none),
-                                // focusedBorder:
-                                //     UnderlineInputBorder(borderSide: BorderSide.none),
-                                border: new OutlineInputBorder(
-                                  borderSide: BorderSide.none,
-                                  borderRadius: const BorderRadius.all(
-                                    const Radius.circular(40.0),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            onPressed: () {
-                              Timer(Duration(milliseconds: 100), () {
-                                myController.clear();
-                              });
-                            },
-                            icon: Icon(
-                              Icons.attach_file,
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.6),
-                              size: 25,
-                            ),
-                          ),
-                          IconButton(
-                            padding: EdgeInsets.all(0),
-                            onPressed: () {
-                              Timer(Duration(milliseconds: 100), () {
-                                myController.clear();
-                              });
-                            },
-                            icon: Icon(
-                              Icons.camera_alt,
-                              color:
-                                  Theme.of(context).hintColor.withOpacity(0.6),
-                              size: 25,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  FloatingActionButton(
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    backgroundColor: Theme.of(context).accentColor,
-                    elevation: 0,
-                    onPressed: () => {},
-                    child: Icon(
-                      Icons.mic,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            buildInputBox(),
             /*Container(
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,

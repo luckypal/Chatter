@@ -77,8 +77,10 @@ class _ContactsPageState extends State<ContactsPage> {
     List<UserModel> contacts = new List<UserModel>();
     contacts.add(contact);
     Navigator.popAndPushNamed(context, "/Chat", arguments: {
-      "name": null,
+      "platform": ChatPlatform.chatter,
+      "title": null,
       "contacts": contacts,
+      "model": null,
     });
   }
 

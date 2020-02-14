@@ -6,6 +6,8 @@ import 'package:chatter/src/models/user/chatter.dart';
 import 'package:chatter/src/utils/utilities.dart';
 
 abstract class ChatterUserService extends BaseUserService {
+  static const String COLLECTION_NAME = "users";
+
   final Firestore firestore = Firestore.instance;
   List<ChatterUserModel> get models => super.models;
 
@@ -41,7 +43,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
     return new Future<List<ChatterUserModel>>(() async {
       List<ChatterUserModel> users = new List<ChatterUserModel>();
       QuerySnapshot query = await firestore
-          .collection('users')
+          .collection(ChatterUserService.COLLECTION_NAME)
           .where("phoneNumber", whereIn: phoneNumbers)
           .getDocuments();
       query.documents.forEach((doc) {

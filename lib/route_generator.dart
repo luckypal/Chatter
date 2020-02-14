@@ -25,9 +25,10 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => PhoneVerifyPage(args: args));
       case '/ProfileInit':
         return MaterialPageRoute(builder: (_) => ProfileInitPage());
-      
+
       case '/Tabs':
-        return MaterialPageRoute(builder: (_) => TabsWidget(currentTab: args != null ? args : 2));
+        return MaterialPageRoute(
+            builder: (_) => TabsWidget(currentTab: args != null ? args : 2));
 
       case '/Contacts':
         return MaterialPageRoute(builder: (_) => ContactsPage());
@@ -36,7 +37,12 @@ class RouteGenerator {
 
       case '/Chat':
         Map<String, dynamic> chatArgs = args;
-        return MaterialPageRoute(builder: (_) => ChatPage(name: chatArgs["name"], contacts: chatArgs["contacts"]));
+        return MaterialPageRoute(
+            builder: (_) => ChatPage(
+                platform: chatArgs["platform"],
+                title: chatArgs["title"],
+                contacts: chatArgs["contacts"],
+                model: chatArgs["model"]));
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();

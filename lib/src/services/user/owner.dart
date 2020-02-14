@@ -71,7 +71,7 @@ class OwnerUserServiceImpl extends OwnerUserService {
         "userName": userUpdateInfo.displayName,
         "phoneNumber": user.phoneNumber,
         "photoUrl": userUpdateInfo.photoUrl,
-        "platform": UserPlatform.chatter,
+        "platform": ChatPlatform.chatter,
         "lastOnlineTime": DateTime.now().millisecondsSinceEpoch,
         "countryCode": {
           "dialCode": countryCode.dialCode, //ex: +1
