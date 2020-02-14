@@ -31,7 +31,10 @@ abstract class MessageModel {
     _platform = platform,
     _message = message,
     _messageType = messageType,
-    _sentTime = sentTime;
+    _sentTime = sentTime {
+      if (_sentTime == 0)
+        _sentTime = DateTime.now().millisecondsSinceEpoch;
+    }
 
   Future<String> save();
 }

@@ -135,4 +135,34 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       multiConversationService.onUpdate(ChatPlatform.chatter);
     });
   }
+  
+  @override
+  StreamBuilder streamBuilder({GlobalKey<AnimatedListState> key, ConversationModel conversationModel}) {
+    String conversationId = conversationModel.identifier;
+
+    return StreamBuilder(
+      stream: ChatterMessageModel.getMessageCollection(conversationId).snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (!snapshot.hasData) {
+          return Container();
+        } else {
+          List<DocumentSnapshot> documents = snapshot.data.documents;
+          return AnimatedList(
+            key: key,
+            reverse: true,
+            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            initialItemCount: documents.length,
+            itemBuilder: (context, index, Animation<double> animation) {
+              ChatterMessageModel messageModel = ChatterMessageModel.createFromDocument(documents [index], conversationId);
+              return Text(messageModel.message);
+              // return ChatMessageListItem(
+              //   model: messageModel,
+              //   animation: animation,
+              // );
+            }
+          );
+        }
+      }
+    );
+  }
 }

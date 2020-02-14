@@ -1,7 +1,9 @@
 import 'package:chatter/src/models/conversation.dart/chatter.dart';
 import 'package:chatter/src/models/message/base.dart';
+import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/services/conversation/chatter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
 class ChatterMessageModel extends MessageModel {
   static const String COLLECTION_NAME = "messages";
@@ -10,12 +12,29 @@ class ChatterMessageModel extends MessageModel {
 
   ChatterMessageModel();
 
-  ChatterMessageModel.create(int platform, String conversationId,
-      String ownerId, String message, int messageType)
-      : super.create(null, conversationId, ownerId, platform, message,
-            messageType, DateTime.now().millisecondsSinceEpoch);
+  ChatterMessageModel.create(
+      {String messageId,
+      @required int platform,
+      @required String conversationId,
+      @required String senderId,
+      @required String message,
+      @required int messageType,
+      int sentTime = 0})
+      : super.create(messageId, conversationId, senderId, platform, message,
+            messageType, sentTime);
 
-  void loadFromDoc(DocumentSnapshot item) {}
+  static ChatterMessageModel createFromDocument(
+      DocumentSnapshot item, String conversationId) {
+    Map<String, dynamic> data = item.data;
+    return ChatterMessageModel.create(
+        messageId: item.documentID,
+        platform: ChatPlatform.chatter,
+        conversationId: conversationId,
+        senderId: data["sender"],
+        message: data["message"],
+        messageType: data["messageType"],
+        sentTime: data["sentTime"]);
+  }
 
   static CollectionReference getMessageCollection(String conversationId) {
     return Firestore.instance

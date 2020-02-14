@@ -36,6 +36,7 @@ class ChatPage extends StatefulWidget {
       : platform = model.platform,
         title = model.title,
         contacts = model.userModel,
+        model = model,
         super(key: key);
 
   @override
@@ -61,11 +62,15 @@ class _ChatPageState extends State<ChatPage> {
   final focusNode = new FocusNode();
   ConversationModel conversationModel;
 
+  Stream<int> testStream;
+
   @override
   void initState() {
     super.initState();
     conversationModel = widget.model;
     multiConversationService = locator<MultiConversationService>();
+
+    testStream = Stream<int>.periodic(Duration(seconds: 1), (x) => x).take(15);
   }
 
   @override
@@ -328,8 +333,10 @@ class _ChatPageState extends State<ChatPage> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Expanded(
-                child:
-                    Container() /*AnimatedList(
+              child: Container(
+                child: multiConversationService.streamBuilder(key: _myListKey, conversationModel: widget.model)
+              ),
+              /*AnimatedList(
               key: _myListKey,
               reverse: true,
               padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
@@ -342,51 +349,8 @@ class _ChatPageState extends State<ChatPage> {
                 );
               },
             ),*/
-                ),
+            ),
             buildInputBox(),
-            /*Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              boxShadow: [
-                BoxShadow(
-                    color: Theme.of(context).hintColor.withOpacity(0.10),
-                    offset: Offset(0, -4),
-                    blurRadius: 10)
-              ],
-            ),
-            child: TextField(
-              controller: myController,
-              decoration: InputDecoration(
-                contentPadding: EdgeInsets.all(10),
-                hintText: 'Chat text here',
-                hintStyle: TextStyle(
-                    color: Theme.of(context).focusColor.withOpacity(0.8)),
-                suffixIcon: IconButton(
-                  padding: EdgeInsets.only(right: 30),
-                  onPressed: () {
-                    // setState(() {
-                    //   _conversationList.conversations[0].chats
-                    //       .insert(0, new Chat(myController.text, '21min ago', _currentUser));
-                    //   _myListKey.currentState.insertItem(0);
-                    // });
-                    Timer(Duration(milliseconds: 100), () {
-                      myController.clear();
-                    });
-                  },
-                  icon: Icon(
-                    UiIcons.cursor,
-                    color: Theme.of(context).accentColor,
-                    size: 20,
-                  ),
-                ),
-                border: UnderlineInputBorder(borderSide: BorderSide.none),
-                enabledBorder:
-                    UnderlineInputBorder(borderSide: BorderSide.none),
-                focusedBorder:
-                    UnderlineInputBorder(borderSide: BorderSide.none),
-              ),
-            ),
-          ),*/
           ],
         ),
       ),

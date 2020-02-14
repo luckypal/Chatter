@@ -57,11 +57,11 @@ class MultiConversationServiceImpl extends MultiConversationService {
     switch (conversationModel.platform) {
       case ChatPlatform.chatter:
         ChatterMessageModel messageModel = ChatterMessageModel.create(
-            ChatPlatform.chatter,
-            conversationModel.identifier,
-            ownerUserService.identifier,
-            message,
-            messageType);
+            platform: ChatPlatform.chatter,
+            conversationId: conversationModel.identifier,
+            senderId: ownerUserService.identifier,
+            message: message,
+            messageType: messageType);
         return sendMessageModel(messageModel);
         break;
     }
@@ -92,5 +92,14 @@ class MultiConversationServiceImpl extends MultiConversationService {
     chatterUserService.load().then((_) {
       chatterConversationService.load();
     });
+  }
+
+  @override
+  StreamBuilder streamBuilder({GlobalKey<AnimatedListState> key, ConversationModel conversationModel}) {
+    switch (conversationModel.platform) {
+      case ChatPlatform.chatter:
+        return chatterConversationService.streamBuilder(key: key, conversationModel: conversationModel);
+    }
+    return null;
   }
 }
