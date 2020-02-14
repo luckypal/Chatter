@@ -1,5 +1,6 @@
 import 'package:chatter/config/text.dart';
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/ConversationWidget.dart';
@@ -60,6 +61,12 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
         isAccessContacts = true;
       });
     }
+  }
+
+  onPressConversation(ConversationModel conversationModel) {
+    Navigator.pushNamed(context, "/ChatWithModel", arguments: {
+      "model": conversationModel,
+    });
   }
 
   Widget createActionButton({IconData icon, String text, Function onPressed}) {
@@ -197,11 +204,9 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
                     return SizedBox(height: 7);
                   },
                   itemBuilder: (context, index) {
-                    // return Text(
-                    //     '$index :  ${conversationService.getModel(index).photoUrl}');
                     return ConversationWidget(
                       model: conversationService.modelAt(index),
-                      onPressed: (conversation) {},
+                      onPressed: onPressConversation,
                       onDismissed: (conversation) {
                         setState(() {
                           // _conversationList.conversations.removeAt(index);

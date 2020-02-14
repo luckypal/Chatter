@@ -29,11 +29,11 @@ class _SplashPageState extends State<SplashPage> {
     UI.closeSpinnerOverlay(context);
 
     if (user == null)
-      Navigator.of(context).pushNamed('/OnBoarding');
+      Navigator.of(context).popAndPushNamed('/OnBoarding');
     else if (user.displayName == null || user.displayName.isEmpty) {
-      Navigator.of(context).pushNamed('/ProfileInit');
+      Navigator.of(context).popAndPushNamed('/ProfileInit');
     } else
-      Navigator.of(context).pushNamed('/Tabs', arguments: 2);
+      Navigator.of(context).popAndPushNamed('/Tabs', arguments: 2);
   }
 
   @override

@@ -39,10 +39,14 @@ class RouteGenerator {
         Map<String, dynamic> chatArgs = args;
         return MaterialPageRoute(
             builder: (_) => ChatPage(
-                platform: chatArgs["platform"],
-                title: chatArgs["title"],
-                contacts: chatArgs["contacts"],
-                model: chatArgs["model"]));
+                  platform: chatArgs["platform"],
+                  title: chatArgs["title"],
+                  contacts: chatArgs["contacts"],
+                ));
+      case '/ChatWithModel':
+        Map<String, dynamic> chatArgs = args;
+        return MaterialPageRoute(
+            builder: (_) => ChatPage.fromModel(chatArgs["model"]));
       default:
         // If there is no such named route in the switch statement, e.g. /third
         return _errorRoute();

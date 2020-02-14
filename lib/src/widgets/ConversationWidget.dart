@@ -2,6 +2,7 @@ import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/utils/color.dart';
+import 'package:chatter/src/utils/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart';
 
@@ -17,6 +18,17 @@ class ConversationWidget extends StatefulWidget {
 }
 
 class _ConversationWidgetState extends State<ConversationWidget> {
+  void onDismissed(DismissDirection direction) {
+    // Remove the item from the data source.
+    setState(() {
+      widget.onDismissed(widget.model);
+    });
+
+    // Then show a snackbar.
+    Scaffold.of(context)
+        .showSnackBar(SnackBar(content: Text("The conversation with ${widget.model.title} is dismissed")));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -34,16 +46,7 @@ class _ConversationWidgetState extends State<ConversationWidget> {
           ),
         ),
       ),
-      onDismissed: (direction) {
-        // Remove the item from the data source.
-        setState(() {
-          widget.onDismissed(widget.model);
-        });
-
-        // Then show a snackbar.
-        Scaffold.of(context)
-            .showSnackBar(SnackBar(content: Text("The conversation with ${widget.model.title} is dismissed")));
-      },
+      onDismissed: onDismissed,
       child: InkWell(
         onTap: () => widget.onPressed(widget.model),
         child: Container(

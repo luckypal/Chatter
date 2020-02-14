@@ -27,10 +27,16 @@ class ChatPage extends StatefulWidget {
   final int platform;
   final String title;
   final List<UserModel> contacts;
-  final ConversationModel model;
+  ConversationModel model;
 
-  const ChatPage({Key key, this.platform, this.title, this.contacts, this.model})
+  ChatPage({Key key, this.platform, this.title, this.contacts})
       : super(key: key);
+
+  ChatPage.fromModel(ConversationModel model, {Key key})
+      : platform = model.platform,
+        title = model.title,
+        contacts = model.userModel,
+        super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
@@ -88,9 +94,11 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage(String message, int messageType) async {
     if (conversationModel == null)
-      conversationModel = await multiConversationService.createConversation(widget.title, widget.contacts, widget.platform);
+      conversationModel = await multiConversationService.createConversation(
+          widget.title, widget.contacts, widget.platform);
 
-    MessageModel messageModel = await multiConversationService.sendMessage(conversationModel, message, messageType);
+    MessageModel messageModel = await multiConversationService.sendMessage(
+        conversationModel, message, messageType);
 
     Timer(Duration(milliseconds: 100), () {
       myController.clear();
