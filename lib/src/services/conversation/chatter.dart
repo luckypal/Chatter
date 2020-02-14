@@ -113,15 +113,24 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
   @override
   void load() {
     String userIdentifier = ownerUserService.identifier;
+    models = new List<ChatterConversationModel>();
 
     ChatterConversationHeaderModel.getCollection(userIdentifier)
         .snapshots()
-        .listen((QuerySnapshot snapshot) {
+        .listen((QuerySnapshot snapshot) async {
+      models.clear();
+
       List<DocumentSnapshot> list = snapshot.documents;
-      list.forEach((headerDoc) async {
+      for (int index = 0; index < list.length; index ++) {
+        DocumentSnapshot headerDoc = list [index];
         String conversationId = headerDoc.documentID;
+
+        ChatterConversationHeaderModel headerModel = await ChatterConversationHeaderModel.loadFromConversationId(userIdentifier, conversationId);
         ChatterConversationModel conversationModel = await ChatterConversationModel.loadFromConversationId(conversationId: conversationId);
-      });
+        conversationModel.headerModel = headerModel;
+
+        models.add(conversationModel);
+      }
 
       multiConversationService.onUpdate(ChatPlatform.chatter);
     });

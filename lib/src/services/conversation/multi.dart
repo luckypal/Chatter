@@ -15,7 +15,26 @@ abstract class MultiConversationService extends BaseConversationService
   ChatterUserService chatterUserService;
   ChatterConversationService chatterConversationService;
 
-  MultiConversationService() {
+  int get length => 0;
+  bool get isEmpty => length == 0;
+  bool get isNotEmpty => length != 0;
+
+  MultiConversationService();
+
+  ConversationModel getModel(int index);
+  void onUpdate(int platform);
+  Function onEvent(int platform) => () => onUpdate(platform);
+
+  Future<MessageModel> sendMessage(
+      ConversationModel conversationModel, String message, int messageType);
+}
+
+class MultiConversationServiceImpl extends MultiConversationService {
+  int get length {
+    return chatterConversationService.models != null ? chatterConversationService.models.length : 0;
+  }
+
+  MultiConversationServiceImpl() {
     chatterUserService = locator<ChatterUserService>();
     chatterConversationService = locator<ChatterConversationService>();
     chatterConversationService.addListener(onEvent(ChatPlatform.chatter));
@@ -23,18 +42,9 @@ abstract class MultiConversationService extends BaseConversationService
     ownerUserService = locator<OwnerUserService>();
   }
 
-  int get length => 0;
-
-  Function onEvent(int platform) => () => onUpdate(platform);
-
-  void onUpdate(int platform);
-
-  Future<MessageModel> sendMessage(
-      ConversationModel conversationModel, String message, int messageType);
-}
-
-class MultiConversationServiceImpl extends MultiConversationService {
-  int get length => chatterConversationService.models.length;
+  ConversationModel getModel(int index) {
+    return chatterConversationService.models [index];
+  }
 
   @override
   void onUpdate(int platform) {

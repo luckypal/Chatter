@@ -51,6 +51,19 @@ class ChatterConversationHeaderModel {
         .collection(ChatterConversationHeaderModel.COLLECTION_NAME);
   }
 
+  static Future<ChatterConversationHeaderModel> loadFromConversationId(String userIdentifier, String conversationId) {
+    return new Future<ChatterConversationHeaderModel>(() async {
+      DocumentSnapshot doc = await getCollection(userIdentifier).document(conversationId).get();
+
+      return ChatterConversationHeaderModel.create(
+        userIdentifier: userIdentifier,
+        conversationId: conversationId,
+        status: doc.data ["status"],
+        unreadMessageCount: doc.data ["unreadMessageCount"]
+      );
+    });
+  }
+
   Future<void> save() {
     return new Future<void>(() async {
       if (_conversationId == null) {
@@ -77,6 +90,8 @@ class ChatterConversationModel extends ConversationModel {
 
   String _title;
   String get title => _title;
+
+  ChatterConversationHeaderModel headerModel;
 
   final Firestore firestore = Firestore.instance;
 

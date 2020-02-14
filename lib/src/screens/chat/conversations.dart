@@ -18,7 +18,6 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
     with SingleTickerProviderStateMixin {
   MultiConversationService conversationService;
   bool isAccessContacts = false;
-  bool isHasContacts = true;
 
   @override
   void initState() {
@@ -29,8 +28,9 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
     conversationService = locator<MultiConversationService>();
     conversationService.addListener(() {
       print("conversationService add Listener");
+      setState(() {});
     });
-    
+
     conversationService.load();
   }
 
@@ -175,49 +175,47 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
   }
 
   Widget contactsList() {
-    return Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          padding: EdgeInsets.symmetric(vertical: 7),
-          child: Column(
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: SearchBarWidget(),
-              ),
-              /*Offstage(
-                offstage: _conversationList.conversations.isEmpty,
-                child: ListView.separated(
+    return Container(
+      width: config.App(context).appWidth(100.0),
+      child: Stack(
+        children: <Widget>[
+          SingleChildScrollView(
+            padding: EdgeInsets.symmetric(vertical: 7),
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SearchBarWidget(),
+                ),
+                ListView.separated(
                   padding: EdgeInsets.symmetric(vertical: 15),
                   shrinkWrap: true,
                   primary: false,
-                  itemCount: _conversationList.conversations.length,
+                  itemCount: conversationService.length,
                   separatorBuilder: (context, index) {
                     return SizedBox(height: 7);
                   },
                   itemBuilder: (context, index) {
-                    return MessageItemWidget(
-                      message: _conversationList.conversations.elementAt(index),
-                      onDismissed: (conversation) {
-                        setState(() {
-                          _conversationList.conversations.removeAt(index);
-                        });
-                      },
-                    );
+                    return Text(
+                        '$index :  ${conversationService.getModel(index).photoUrl}');
+                    // return MessageItemWidget(
+                    //   message: _conversationList.conversations.elementAt(index),
+                    //   onDismissed: (conversation) {
+                    //     setState(() {
+                    //       _conversationList.conversations.removeAt(index);
+                    //     });
+                    //   },
+                    // );
                   },
                 ),
-              ),
-              Offstage(
-                offstage: _conversationList.conversations.isNotEmpty,
-                child: EmptyMessagesWidget(),
-              )*/
-            ],
+              ],
+            ),
           ),
-        ),
-        Container(
-          width: config.App(context).appWidth(100.0),
-        ),
-      ],
+          Container(
+            width: config.App(context).appWidth(100.0),
+          ),
+        ],
+      ),
     );
   }
 
@@ -225,6 +223,6 @@ class _ConversationsWidgetState extends State<ConversationsWidget>
   Widget build(BuildContext context) {
     // double penIconSize = app.appWidth(15.0);
 
-    return isHasContacts ? contactsList() : blankContacts();
+    return conversationService.isNotEmpty ? contactsList() : blankContacts();
   }
 }
