@@ -1,5 +1,7 @@
 import 'dart:math';
+import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/user/base.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:contacts_service/contacts_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:chatter/src/models/user/chatter.dart';
@@ -10,8 +12,12 @@ abstract class ChatterUserService extends BaseUserService {
 
   final Firestore firestore = Firestore.instance;
   List<ChatterUserModel> get models => super.models;
+  
+  OwnerUserService ownerUserService;
 
-  ChatterUserService();
+  ChatterUserService() {
+    ownerUserService = locator<OwnerUserService>();
+  }
 }
 
 class ChatterUserServiceImpl extends ChatterUserService {
@@ -19,7 +25,11 @@ class ChatterUserServiceImpl extends ChatterUserService {
   Future<List<ChatterUserModel>> load() {
     return new Future<List<ChatterUserModel>>(() async {
       Iterable<Contact> contacts = await ContactsService.getContacts();
-      await filterWithServer(contacts);
+      if (models == null)
+        models = new List<ChatterUserModel>();
+      else models.clear();
+      
+      await filterWithFirebase(contacts);
       return models;
     });
   }
@@ -64,41 +74,98 @@ class ChatterUserServiceImpl extends ChatterUserService {
     });
   }
 
-  Future<void> filterWithServer(Iterable<Contact> contacts) async {
-    return new Future<void>(() async {
-      // List<String> phoneNumbers = List<String>();
-
-      Map<String, Contact> contactTable = Map<String, Contact>();
-
-      contacts.forEach((contact) {
-        if (contact.phones.length == 0) return;
-
-        contact.phones.forEach((phoneNumber) {
-          String newValue =
-              Utilities.makeStandardPhoneNumber(phoneNumber.value);
-          contactTable[newValue] = contact;
-        });
+  @override
+  Future<List<ChatterUserModel>> findUsersByIds({List<String> contactIds}) {
+    return new Future<List<ChatterUserModel>>(() async {
+      List<ChatterUserModel> users = new List<ChatterUserModel>();
+      QuerySnapshot query = await firestore
+          .collection(ChatterUserService.COLLECTION_NAME)
+          .where("id", whereIn: contactIds)
+          .getDocuments();
+      query.documents.forEach((doc) {
+        users.add(new ChatterUserModel(doc: doc));
       });
 
-      int start = 0;
-      models = new List<ChatterUserModel>();
-      List<String> phoneNumbers = contactTable.keys.toList(growable: false);
-      // await serverService.findPhones(phoneNumbers);
-
-      while (start < phoneNumbers.length) {
-        int end = min(start + 10, phoneNumbers.length);
-        List<String> subPhoneNumbers = phoneNumbers.sublist(start, end);
-        List<ChatterUserModel> userList =
-            await findUsersByPhoneNumber(phoneNumbers: subPhoneNumbers);
-
-        userList.forEach((chatterUser) {
-          chatterUser.contact = contactTable[chatterUser.phoneNumber];
-
-          models.add(chatterUser);
-        });
-
-        start += 10;
-      }
+      return users;
     });
+  }
+
+  Future<void> filterWithFirebase(Iterable<Contact> contacts) async {
+    return new Future<void>(() async {
+      List<String> contactIds = this.ownerUserService.contactIds;
+      if (contactIds == null)
+        getContactsFromPhoneContacts(contacts);
+      else
+        getContactsFromIds(contacts, contactIds);
+    });
+  }
+
+  Map<String, Contact> convertContactsByPhoneNumber(Iterable<Contact> contacts) {
+    Map<String, Contact> contactTable = Map<String, Contact>();
+
+    contacts.forEach((contact) {
+      if (contact.phones.length == 0) return;
+
+      contact.phones.forEach((phoneNumber) {
+        String newValue =
+            Utilities.makeStandardPhoneNumber(phoneNumber.value);
+        contactTable[newValue] = contact;
+      });
+    });
+
+    return contactTable;
+  }
+
+  /**
+   * - Extract phone numbers from contacts
+   * - Get contacts from firebase using the phone numbers
+   */
+  Future<void> getContactsFromPhoneContacts(Iterable<Contact> contacts) async {
+    Map<String, Contact> contactTable = convertContactsByPhoneNumber(contacts);
+
+    int start = 0;
+    List<String> phoneNumbers = contactTable.keys.toList(growable: false);
+    // await serverService.findPhones(phoneNumbers);
+    List<String> contactIds = new List<String>();
+
+    while (start < phoneNumbers.length) {
+      int end = min(start + 10, phoneNumbers.length);
+      List<String> subPhoneNumbers = phoneNumbers.sublist(start, end);
+      List<ChatterUserModel> userList =
+          await findUsersByPhoneNumber(phoneNumbers: subPhoneNumbers);
+
+      userList.forEach((chatterUser) {
+        chatterUser.contact = contactTable[chatterUser.phoneNumber];
+
+        models.add(chatterUser);
+        contactIds.add(chatterUser.identifier);
+      });
+
+      start += 10;
+    }
+
+    ownerUserService.contactIds = contactIds;
+  }
+
+  /**
+   * Get contacts from contact Id list
+   */
+  Future<void> getContactsFromIds(Iterable<Contact> contacts, List<String> contactIds) async {
+    Map<String, Contact> contactTable = convertContactsByPhoneNumber(contacts);
+
+    int start = 0;
+    while(start < contactIds.length) {
+      int end = min(start + 10, contactIds.length);
+      List<String> subContactIds = contactIds.sublist(start, end);
+      List<ChatterUserModel> userList = await findUsersByIds(contactIds: subContactIds);
+
+      userList.forEach((chatterUser) {
+        chatterUser.contact = contactTable[chatterUser.phoneNumber];
+
+        models.add(chatterUser);
+      });
+
+      start += 10;
+    }
   }
 }

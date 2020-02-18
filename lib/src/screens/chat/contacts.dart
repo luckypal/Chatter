@@ -4,6 +4,7 @@ import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/services/user/chatter.dart';
+import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -24,6 +25,7 @@ class ContactsPage extends StatefulWidget {
 class _ContactsPageState extends State<ContactsPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   ChatterUserService chatterUserService;
+  OwnerUserService ownerUserService;
   List<UserModel> contacts;
   String searchText = "";
 
@@ -31,6 +33,7 @@ class _ContactsPageState extends State<ContactsPage> {
   void initState() {
     super.initState();
     chatterUserService = locator<ChatterUserService>();
+    ownerUserService = locator<OwnerUserService>();
 
     contacts = List<UserModel>();
 
@@ -43,6 +46,7 @@ class _ContactsPageState extends State<ContactsPage> {
   void initContact() async {
     chatterUserService = locator<ChatterUserService>();
     UI.showSpinnerOverlay(context);
+    this.ownerUserService.contactIds = null;
     await chatterUserService.load();
     UI.closeSpinnerOverlay(context);
     setState(() {

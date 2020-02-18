@@ -4,11 +4,15 @@ import 'package:country_code_picker/country_code.dart';
 import 'package:contacts_service/contacts_service.dart';
 
 class ChatterUserModel extends UserModel {
+  static const String COLLECTION_NAME = "users";
+
   CountryCode countryCode;
   
   Contact _contact;
   dynamic get contact => _contact;
   set contact(dynamic value) => _contact = value;
+
+  List<String> contactIds;
   
   String get userName => _contact != null ? _contact.displayName : super.userName;
 
@@ -28,6 +32,12 @@ class ChatterUserModel extends UserModel {
       "lastOnlineTime": data["lastOnlineTime"]
     });
 
+    if (data["contactIds"] != null) {
+      contactIds = List<String>();
+      for (String contactId in data["contactIds"])
+        contactIds.add(contactId);
+    }
+
     countryCode = new CountryCode(
       dialCode: data["countryCode"]["dialCode"],
       code: data["countryCode"]["code"],
@@ -35,5 +45,9 @@ class ChatterUserModel extends UserModel {
     );
 
     // setUserState();
+  }
+
+  static DocumentReference getDocumentRef(identifier) {
+    return Firestore.instance.collection(ChatterUserModel.COLLECTION_NAME).document(identifier);
   }
 }

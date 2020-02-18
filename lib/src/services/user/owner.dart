@@ -17,6 +17,9 @@ abstract class OwnerUserService {
   ChatterUserModel _model;
   ChatterUserModel get model => _model;
 
+  List<String> get contactIds => _model.contactIds;
+  set contactIds(List<String> value) => {};
+
   String get identifier => _model.identifier;
 
   CountryCode countryCode;
@@ -28,6 +31,14 @@ abstract class OwnerUserService {
 }
 
 class OwnerUserServiceImpl extends OwnerUserService {
+  set contactIds(List<String> value) {
+    _model.contactIds = value;
+    if (value == null) return;
+    ChatterUserModel.getDocumentRef(_model.identifier).updateData({
+      "contactIds": value
+    });
+  }
+
   @override
   Future<FirebaseUser> load({bool isStrict = true}) {
     return new Future(() async {
@@ -68,7 +79,7 @@ class OwnerUserServiceImpl extends OwnerUserService {
   Future<void> update(UserUpdateInfo userUpdateInfo) {
     return new Future(() async {
       _user = await firebaseAuth.currentUser();
-      await firestore.collection('users').document(user.uid).setData({
+      await ChatterUserModel.getDocumentRef(user.uid).updateData({
         "id": user.uid,
         "userName": userUpdateInfo.displayName,
         "phoneNumber": user.phoneNumber,

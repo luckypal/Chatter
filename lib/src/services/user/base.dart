@@ -27,4 +27,5 @@ abstract class BaseUserService {
   }
 
   Future<List<UserModel>> findUsersByPhoneNumber({List<String> phoneNumbers});
+  Future<List<UserModel>> findUsersByIds({List<String> contactIds});
 }
