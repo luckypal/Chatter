@@ -1,5 +1,7 @@
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
 import 'package:chatter/src/widgets/searchbarwidget.dart';
@@ -20,6 +22,7 @@ class ContactsGroupPage extends StatefulWidget {
 
 class _ContactsGroupPageState extends State<ContactsGroupPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  MultiConversationService multiConversationService;
   ChatterUserService chatterUserService;
   List<UserModel> contacts;
   List<UserModel> selectedContacts;
@@ -29,6 +32,7 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
   void initState() {
     super.initState();
     chatterUserService = locator<ChatterUserService>();
+    multiConversationService = locator<MultiConversationService>();
     contacts = chatterUserService.models;
 
     if (widget.selectedContacts != null)
@@ -45,18 +49,29 @@ class _ContactsGroupPageState extends State<ContactsGroupPage> {
 
   void onCreateGroup() {
     if (selectedContacts.length == 1) {
-      Navigator.popAndPushNamed(context, "/Chat", arguments: {
-        "name": null,
-        "contacts": selectedContacts,
-      });
+      ConversationModel model = multiConversationService.findConversationModel(selectedContacts [0]);
+      if (model == null) {
+        Navigator.popAndPushNamed(context, "/Chat", arguments: {
+          "platform": ChatPlatform.chatter,
+          "title": null,
+          "contacts": selectedContacts,
+          "model": null,
+        });
+      } else {
+        Navigator.popAndPushNamed(context, "/ChatWithModel", arguments: {
+          "model": model,
+        });
+      }
     } else
       UI.showPrompt(
         context,
         label: "Group chat name",
         onResult: (bool result, String value) {
           Navigator.popAndPushNamed(context, "/Chat", arguments: {
-            "name": value,
+            "platform": ChatPlatform.chatter,
+            "title": value,
             "contacts": selectedContacts,
+            "model": null,
           });
         },
       );

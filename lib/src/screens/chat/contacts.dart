@@ -92,7 +92,7 @@ class _ContactsPageState extends State<ContactsPage> {
         "model": null,
       });
     } else {
-      Navigator.pushNamed(context, "/ChatWithModel", arguments: {
+      Navigator.popAndPushNamed(context, "/ChatWithModel", arguments: {
         "model": model,
       });
     }
