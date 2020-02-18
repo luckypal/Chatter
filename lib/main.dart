@@ -1,6 +1,7 @@
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/services/conversation/chatter.dart';
 import 'package:chatter/src/services/conversation/multi.dart';
+import 'package:chatter/src/services/user/multi.dart';
 import 'package:flutter/material.dart';
 import 'package:chatter/config/app_config.dart' as config;
 import 'package:chatter/route_generator.dart';
@@ -30,8 +31,10 @@ class MyApp extends StatelessWidget {
     isCreatedService = true;
     locator.registerLazySingleton<PhoneVerifyService>(() => PhoneVerifyServiceImpl());
     locator.registerLazySingleton<OwnerUserService>(() => OwnerUserServiceImpl());
-    locator.registerLazySingleton<ChatterUserService>(() => ChatterUserServiceImpl());
     locator.registerLazySingleton<ServerService>(() => ServerServiceImpl());
+
+    locator.registerLazySingleton<ChatterUserService>(() => ChatterUserServiceImpl());
+    locator.registerLazySingleton<MultiUserService>(() => MultiUserServiceImpl());
     
     chatterConversationService = ChatterConversationServiceImpl();
     locator.registerLazySingleton<ChatterConversationService>(() => chatterConversationService);

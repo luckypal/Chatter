@@ -333,9 +333,9 @@ class _ChatPageState extends State<ChatPage> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Expanded(
-              child: Container(
+              child: widget.model != null ? Container(
                 child: multiConversationService.streamBuilder(key: _myListKey, conversationModel: widget.model)
-              ),
+              ) : Container(),
               /*AnimatedList(
               key: _myListKey,
               reverse: true,

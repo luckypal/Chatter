@@ -5,14 +5,15 @@ import 'package:chatter/src/models/message/chatter.dart';
 import 'package:chatter/src/models/user/base.dart';
 import 'package:chatter/src/services/conversation/base.dart';
 import 'package:chatter/src/services/conversation/chatter.dart';
-import 'package:chatter/src/services/user/chatter.dart';
+import 'package:chatter/src/services/user/multi.dart';
 import 'package:chatter/src/services/user/owner.dart';
 import 'package:flutter/material.dart';
 
 abstract class MultiConversationService extends BaseConversationService
     with ChangeNotifier {
   OwnerUserService ownerUserService;
-  ChatterUserService chatterUserService;
+  MultiUserService multiUserService;
+  
   ChatterConversationService chatterConversationService;
 
   int get length => 0;
@@ -35,7 +36,7 @@ class MultiConversationServiceImpl extends MultiConversationService {
   }
 
   MultiConversationServiceImpl() {
-    chatterUserService = locator<ChatterUserService>();
+    multiUserService = locator<MultiUserService>();
     chatterConversationService = locator<ChatterConversationService>();
     chatterConversationService.addListener(onEvent(ChatPlatform.chatter));
 
@@ -89,7 +90,7 @@ class MultiConversationServiceImpl extends MultiConversationService {
 
   @override
   void load() {
-    chatterUserService.load().then((_) {
+    multiUserService.load().then((_) {
       chatterConversationService.load();
     });
   }

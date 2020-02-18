@@ -8,8 +8,6 @@ import 'package:chatter/src/models/user/chatter.dart';
 import 'package:chatter/src/utils/utilities.dart';
 
 abstract class ChatterUserService extends BaseUserService {
-  static const String COLLECTION_NAME = "users";
-
   final Firestore firestore = Firestore.instance;
   List<ChatterUserModel> get models => super.models;
   
@@ -54,7 +52,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
 
     if (model != null) return model;
     
-    DocumentSnapshot doc = await firestore.collection(ChatterUserService.COLLECTION_NAME).document(identifier).get();
+    DocumentSnapshot doc = await firestore.collection(ChatterUserModel.COLLECTION_NAME).document(identifier).get();
     return ChatterUserModel(doc: doc);
   }
 
@@ -63,7 +61,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
     return new Future<List<ChatterUserModel>>(() async {
       List<ChatterUserModel> users = new List<ChatterUserModel>();
       QuerySnapshot query = await firestore
-          .collection(ChatterUserService.COLLECTION_NAME)
+          .collection(ChatterUserModel.COLLECTION_NAME)
           .where("phoneNumber", whereIn: phoneNumbers)
           .getDocuments();
       query.documents.forEach((doc) {
@@ -79,7 +77,7 @@ class ChatterUserServiceImpl extends ChatterUserService {
     return new Future<List<ChatterUserModel>>(() async {
       List<ChatterUserModel> users = new List<ChatterUserModel>();
       QuerySnapshot query = await firestore
-          .collection(ChatterUserService.COLLECTION_NAME)
+          .collection(ChatterUserModel.COLLECTION_NAME)
           .where("id", whereIn: contactIds)
           .getDocuments();
       query.documents.forEach((doc) {
@@ -94,9 +92,9 @@ class ChatterUserServiceImpl extends ChatterUserService {
     return new Future<void>(() async {
       List<String> contactIds = this.ownerUserService.contactIds;
       if (contactIds == null)
-        getContactsFromPhoneContacts(contacts);
+        await getContactsFromPhoneContacts(contacts);
       else
-        getContactsFromIds(contacts, contactIds);
+        await getContactsFromIds(contacts, contactIds);
     });
   }
 

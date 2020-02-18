@@ -3,7 +3,7 @@ import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
 import 'package:chatter/src/models/user/base.dart';
-import 'package:chatter/src/services/user/chatter.dart';
+import 'package:chatter/src/services/user/multi.dart';
 import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/utils/ui.dart';
 import 'package:chatter/src/widgets/DrawerWidget.dart';
@@ -24,7 +24,7 @@ class ContactsPage extends StatefulWidget {
 
 class _ContactsPageState extends State<ContactsPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  ChatterUserService chatterUserService;
+  MultiUserService multiUserService;
   OwnerUserService ownerUserService;
   List<UserModel> contacts;
   String searchText = "";
@@ -32,33 +32,31 @@ class _ContactsPageState extends State<ContactsPage> {
   @override
   void initState() {
     super.initState();
-    chatterUserService = locator<ChatterUserService>();
+    multiUserService = locator<MultiUserService>();
     ownerUserService = locator<OwnerUserService>();
 
     contacts = List<UserModel>();
 
-    if (chatterUserService.models == null)
+    if (multiUserService.models == null)
       new Future.delayed(const Duration(milliseconds: 100), initContact);
     else
-      contacts.addAll(chatterUserService.models);
+      contacts.addAll(multiUserService.models);
   }
 
   void initContact() async {
-    chatterUserService = locator<ChatterUserService>();
     UI.showSpinnerOverlay(context);
     this.ownerUserService.contactIds = null;
-    await chatterUserService.load();
+    await multiUserService.load();
     UI.closeSpinnerOverlay(context);
     setState(() {
-      this.chatterUserService = chatterUserService;
-      contacts.addAll(chatterUserService.models);
+      contacts.addAll(multiUserService.models);
     });
   }
 
   void onChangedSearchText(String value) {
     setState(() {
       searchText = value;
-      contacts = chatterUserService.findContacts(value);
+      contacts = multiUserService.findContacts(value);
     });
   }
 
@@ -78,6 +76,7 @@ class _ContactsPageState extends State<ContactsPage> {
   }
 
   void onContactPressed(UserModel contact) {
+    
     List<UserModel> contacts = new List<UserModel>();
     contacts.add(contact);
     Navigator.popAndPushNamed(context, "/Chat", arguments: {
