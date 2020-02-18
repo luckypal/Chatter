@@ -103,4 +103,13 @@ class MultiConversationServiceImpl extends MultiConversationService {
     }
     return null;
   }
+
+  @override
+  ConversationModel findConversationModel(UserModel user) {
+    switch (user.platform) {
+      case ChatPlatform.chatter:
+        return chatterConversationService.findConversationModel(user);
+    }
+    return null;
+  }
 }

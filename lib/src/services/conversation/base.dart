@@ -14,4 +14,6 @@ abstract class BaseConversationService {
   Future<MessageModel> sendMessageModel(MessageModel msg);
   void load();
   StreamBuilder streamBuilder({GlobalKey<AnimatedListState> key, ConversationModel conversationModel});
+
+  ConversationModel findConversationModel(UserModel user);
 }

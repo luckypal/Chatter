@@ -2,7 +2,9 @@ import 'dart:io' show Platform;
 import 'package:chatter/config/text.dart';
 import 'package:chatter/config/ui_icons.dart';
 import 'package:chatter/service_locator.dart';
+import 'package:chatter/src/models/conversation.dart/base.dart';
 import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/services/user/multi.dart';
 import 'package:chatter/src/services/user/owner.dart';
 import 'package:chatter/src/utils/ui.dart';
@@ -26,6 +28,8 @@ class _ContactsPageState extends State<ContactsPage> {
   // final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   MultiUserService multiUserService;
   OwnerUserService ownerUserService;
+  MultiConversationService multiConversationService;
+
   List<UserModel> contacts;
   String searchText = "";
 
@@ -34,6 +38,7 @@ class _ContactsPageState extends State<ContactsPage> {
     super.initState();
     multiUserService = locator<MultiUserService>();
     ownerUserService = locator<OwnerUserService>();
+    multiConversationService = locator<MultiConversationService>();
 
     contacts = List<UserModel>();
 
@@ -75,16 +80,22 @@ class _ContactsPageState extends State<ContactsPage> {
     }
   }
 
-  void onContactPressed(UserModel contact) {
-    
-    List<UserModel> contacts = new List<UserModel>();
-    contacts.add(contact);
-    Navigator.popAndPushNamed(context, "/Chat", arguments: {
-      "platform": ChatPlatform.chatter,
-      "title": null,
-      "contacts": contacts,
-      "model": null,
-    });
+  void onContactPressed(UserModel user) {
+    ConversationModel model = multiConversationService.findConversationModel(user);
+    if (model == null) {
+      List<UserModel> contacts = new List<UserModel>();
+      contacts.add(user);
+      Navigator.popAndPushNamed(context, "/Chat", arguments: {
+        "platform": ChatPlatform.chatter,
+        "title": null,
+        "contacts": contacts,
+        "model": null,
+      });
+    } else {
+      Navigator.pushNamed(context, "/ChatWithModel", arguments: {
+        "model": model,
+      });
+    }
   }
 
   void onInviteFriend() {

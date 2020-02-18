@@ -6,6 +6,7 @@ import 'package:chatter/src/models/conversation.dart/chatter.dart';
 import 'package:chatter/src/models/message/base.dart';
 import 'package:chatter/src/models/message/chatter.dart';
 import 'package:chatter/src/models/user/base.dart';
+import 'package:chatter/src/models/user/chatter.dart';
 import 'package:chatter/src/services/conversation/base.dart';
 import 'package:chatter/src/services/conversation/multi.dart';
 import 'package:chatter/src/services/user/chatter.dart';
@@ -167,5 +168,14 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
             );
           }
         });
+  }
+
+  @override
+  ChatterConversationModel findConversationModel(UserModel user) {
+    for (ChatterConversationModel model in models) {
+      if (model.isSingleChat && model.userIds.contains(user.identifier))
+        return model;
+    }
+    return null;
   }
 }
