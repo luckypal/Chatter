@@ -15,20 +15,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 /**
- * conversationHeaders: Object {
- *  userId: Object {
- *    conversationId: {
- *      status: false,
- *      unread: 0,
- *      ...
- *    }
- *  }
- * }
- * 
  * conversations: Object {
  *  conversationId: {
+ *    title: string,
  *    users: [userId1, userId2, ...],
- *    createdAt: *****
+ *    createdTime: *****
  *  }
  * }
  */
@@ -80,7 +71,7 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       List<String> userIds = new List<String>();
       userIds.add(userIdentifier);
 
-      ChatterConversationHeaderModel headerModel =
+      /*ChatterConversationHeaderModel headerModel =
           ChatterConversationHeaderModel.create(
               userIdentifier: userIdentifier,
               conversationId: null,
@@ -101,12 +92,12 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
                 status: ConversationStatus.WAITING_ACCEPT,
                 unreadMessageCount: 0);
         otherHeaderModel.save();
-      });
+      });*/
 
       int createdTime = DateTime.now().millisecondsSinceEpoch;
       ConversationModel conversationModel = ChatterConversationModel.create(
-          conversationId, title, userIds, createdTime);
-      conversationModel.save();
+          null, title, userIds, createdTime);
+      await conversationModel.save();
 
       return conversationModel;
     });
@@ -116,30 +107,22 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
   void load() {
     String userIdentifier = ownerUserService.identifier;
     models = new List<ChatterConversationModel>();
+    firestore.collection(ChatterConversationModel.COLLECTION_NAME)
+      .where("userIds", arrayContains: userIdentifier)
+      .snapshots()
+      .listen((QuerySnapshot snapshot) async {
+        models.clear();
+        
+        List<DocumentSnapshot> list = snapshot.documents;
+        for (DocumentSnapshot document in list) {
+          ChatterConversationModel conversationModel = ChatterConversationModel.createFromDocument(document);
 
-    ChatterConversationHeaderModel.getCollection(userIdentifier)
-        .snapshots()
-        .listen((QuerySnapshot snapshot) async {
-      models.clear();
+          await conversationModel.loadUsersForConversation();
+          models.add(conversationModel);
+        }
 
-      List<DocumentSnapshot> list = snapshot.documents;
-      for (int index = 0; index < list.length; index++) {
-        DocumentSnapshot headerDoc = list[index];
-        String conversationId = headerDoc.documentID;
-
-        ChatterConversationHeaderModel headerModel =
-            await ChatterConversationHeaderModel.loadFromConversationId(
-                userIdentifier, conversationId);
-        ChatterConversationModel conversationModel =
-            await ChatterConversationModel.loadFromConversationId(
-                conversationId: conversationId);
-        conversationModel.headerModel = headerModel;
-
-        models.add(conversationModel);
-      }
-
-      multiConversationService.onUpdate(ChatPlatform.chatter);
-    });
+        multiConversationService.onUpdate(ChatPlatform.chatter);
+      });
   }
 
   @override

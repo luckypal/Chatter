@@ -47,5 +47,5 @@ abstract class ConversationModel {
         this._platform = platform,
         this._createdTime = createdTime;
   
-  void save();
+  Future<void> save();
 }

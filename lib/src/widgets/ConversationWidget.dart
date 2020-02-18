@@ -11,7 +11,8 @@ class ConversationWidget extends StatefulWidget {
   final ValueChanged<ConversationModel> onPressed;
   final ValueChanged<ConversationModel> onDismissed;
 
-  ConversationWidget({Key key, this.model, this.onPressed, this.onDismissed}) : super(key: key);
+  ConversationWidget({Key key, this.model, this.onPressed, this.onDismissed})
+      : super(key: key);
 
   @override
   _ConversationWidgetState createState() => _ConversationWidgetState();
@@ -25,8 +26,9 @@ class _ConversationWidgetState extends State<ConversationWidget> {
     });
 
     // Then show a snackbar.
-    Scaffold.of(context)
-        .showSnackBar(SnackBar(content: Text("The conversation with ${widget.model.title} is dismissed")));
+    Scaffold.of(context).showSnackBar(SnackBar(
+        content:
+            Text("The conversation with ${widget.model.title} is dismissed")));
   }
 
   @override
@@ -50,13 +52,16 @@ class _ConversationWidgetState extends State<ConversationWidget> {
       child: InkWell(
         onTap: () => widget.onPressed(widget.model),
         child: Container(
-          color: widget.model.unreadMessageCount == 0 ? Colors.transparent : Theme.of(context).focusColor.withOpacity(0.15),
+          color: widget.model.unreadMessageCount == 0
+              ? Colors.transparent
+              : Theme.of(context).focusColor.withOpacity(0.15),
           padding: EdgeInsets.symmetric(horizontal: 15, vertical: 5),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               Stack(
-                children: <Widget>[CircleAvatar(
+                children: <Widget>[
+                  CircleAvatar(
                     backgroundImage: Image.network(widget.model.photoUrl).image,
                   ),
                   Positioned(
@@ -92,7 +97,10 @@ class _ConversationWidgetState extends State<ConversationWidget> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: Theme.of(context).textTheme.caption.merge(
-                            TextStyle(fontWeight: widget.model.unreadMessageCount == 0 ? FontWeight.w300 : FontWeight.w600)),
+                            TextStyle(
+                                fontWeight: widget.model.unreadMessageCount == 0
+                                    ? FontWeight.w300
+                                    : FontWeight.w600)),
                       ),
                     ),
                   ],

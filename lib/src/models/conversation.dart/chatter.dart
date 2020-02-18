@@ -14,7 +14,7 @@ class ConversationStatus {
   static const int BLOCKED = 3;
   static const int DELETED = -1;
 }
-
+/*
 class ChatterConversationHeaderModel {
   static const String COLLECTION_NAME = "conversationHeaders";
 
@@ -83,24 +83,23 @@ class ChatterConversationHeaderModel {
         });
     });
   }
-}
+}*/
 
 class ChatterConversationModel extends ConversationModel {
   static const String COLLECTION_NAME = "conversations";
 
-
-  ChatterConversationHeaderModel headerModel;
+  // ChatterConversationHeaderModel headerModel;
 
   final Firestore firestore = Firestore.instance;
 
   ChatterConversationModel();
-  
-  int get unreadMessageCount => headerModel.unreadMessageCount;
-  
+
+  int get unreadMessageCount => 0;
+
   bool get hasUnreadMessage => unreadMessageCount != 0;
 
   String get title => userIds.length == 2 ? userModel[0].userName : super.title;
-  
+
   bool get hasLastMessage => true;
   String get lastMessage => "This is last message.";
 
@@ -115,38 +114,53 @@ class ChatterConversationModel extends ConversationModel {
         .document(conversationId);
   }
 
+  static ChatterConversationModel createFromDocument(
+      DocumentSnapshot document) {
+    List<String> userIds = [];
+    document.data["userIds"].forEach((userId) => userIds.add(userId));
+    return ChatterConversationModel.create(
+        document.documentID,
+        document.data["title"],
+        userIds,
+        document.data["createdTime"]);
+  }
+
   static Future<ChatterConversationModel> loadFromConversationId(
       {String conversationId}) {
     return new Future<ChatterConversationModel>(() async {
-      Map<String, dynamic> data = (await getDocument(conversationId).get()).data;
+      Map<String, dynamic> data =
+          (await getDocument(conversationId).get()).data;
       List<String> userIds = new List<String>();
       data["userIds"].forEach((userId) {
         userIds.add(userId);
       });
       // userIds.addAll(data["userIds"]);
 
-      ChatterConversationModel conversationModel = ChatterConversationModel.create(
-        conversationId,
-        data["title"],
-        userIds,
-        data["createdTime"]
-      );
+      ChatterConversationModel conversationModel =
+          ChatterConversationModel.create(
+              conversationId, data["title"], userIds, data["createdTime"]);
 
-      if (conversationModel.userIds.length == 2) { //One-to-one chat
-        OwnerUserService ownerUserService = locator<OwnerUserService>();
-        int otherUserIndex = conversationModel.userIds [0] == ownerUserService.identifier ? 1 : 0;
-        String otherUserId = conversationModel.userIds [otherUserIndex];
-
-        ChatterUserService userService = locator<ChatterUserService>();
-        ChatterUserModel otherUserModel = await userService.findUserByIdentifier(otherUserId);
-
-        conversationModel.photoUrl = otherUserModel.photoUrl;
-        conversationModel.userModel = new List<ChatterUserModel>();
-        conversationModel.userModel.add(otherUserModel);
-      }
+      await conversationModel.loadUsersForConversation();
 
       return conversationModel;
     });
+  }
+
+  Future<void> loadUsersForConversation() async {
+    if (userIds.length == 2) {
+      //One-to-one chat
+      OwnerUserService ownerUserService = locator<OwnerUserService>();
+      int otherUserIndex = userIds[0] == ownerUserService.identifier ? 1 : 0;
+      String otherUserId = userIds[otherUserIndex];
+
+      ChatterUserService userService = locator<ChatterUserService>();
+      ChatterUserModel otherUserModel =
+          await userService.findUserByIdentifier(otherUserId);
+
+      photoUrl = otherUserModel.photoUrl;
+      userModel = new List<ChatterUserModel>();
+      userModel.add(otherUserModel);
+    }
   }
   /*static ChatterConversationModel fromDocument(DocumentSnapshot item) {
     ChatterConversationModel model = ChatterConversationModel();
@@ -159,8 +173,21 @@ class ChatterConversationModel extends ConversationModel {
   }*/
 
   @override
-  void save() {
-    ChatterConversationModel.getDocument(identifier).setData(
-        {"title": title, "userIds": userIds, "createdAt": createdTime});
+  Future<void> save() {
+    return new Future<void>(() async {
+      Map<String, dynamic> data = {
+        "title": title,
+        "userIds": userIds,
+        "createdTime": createdTime
+      };
+      if (identifier == null) {
+        DocumentReference ref = await firestore
+            .collection(ChatterConversationModel.COLLECTION_NAME)
+            .add(data);
+        identifier = ref.documentID;
+      } else {
+        ChatterConversationModel.getDocument(identifier).setData(data);
+      }
+    });
   }
 }
