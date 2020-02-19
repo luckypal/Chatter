@@ -22,6 +22,8 @@ class MultiUserServiceImpl extends MultiUserService {
     List<UserModel> chatterUserModel = await chatterUserService.load();
 
     if (models == null) models = new List<UserModel>();
+    else models.clear();
+    
     models.addAll(chatterUserModel);
 
     return models;

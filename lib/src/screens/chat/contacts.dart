@@ -54,6 +54,7 @@ class _ContactsPageState extends State<ContactsPage> {
     await multiUserService.load();
     UI.closeSpinnerOverlay(context);
     setState(() {
+      contacts.clear();
       contacts.addAll(multiUserService.models);
     });
   }
