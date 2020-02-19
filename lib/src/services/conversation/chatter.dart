@@ -72,34 +72,16 @@ class ChatterConversationServiceImpl extends ChatterConversationService {
       List<String> userIds = new List<String>();
       userIds.add(userIdentifier);
 
-      /*ChatterConversationHeaderModel headerModel =
-          ChatterConversationHeaderModel.create(
-              userIdentifier: userIdentifier,
-              conversationId: null,
-              status: ConversationStatus.ACCEPTED,
-              unreadMessageCount: 0);
-      headerModel.save();
-
-      String conversationId = headerModel.conversationId;
-
       receivers.forEach((user) {
         String identifier = user.identifier;
         userIds.add(identifier);
-
-        ChatterConversationHeaderModel otherHeaderModel =
-            ChatterConversationHeaderModel.create(
-                userIdentifier: userIdentifier,
-                conversationId: conversationId,
-                status: ConversationStatus.WAITING_ACCEPT,
-                unreadMessageCount: 0);
-        otherHeaderModel.save();
-      });*/
+      });
 
       int createdTime = DateTime.now().millisecondsSinceEpoch;
       ConversationModel conversationModel = ChatterConversationModel.create(
           null, title, userIds, createdTime);
       await conversationModel.save();
-
+      await conversationModel.loadUsersForConversation();
       return conversationModel;
     });
   }

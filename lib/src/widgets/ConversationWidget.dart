@@ -33,6 +33,8 @@ class _ConversationWidgetState extends State<ConversationWidget> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.model == null) return Container();
+
     return Dismissible(
       key: Key(widget.model.hashCode.toString()),
       background: Container(
@@ -61,9 +63,10 @@ class _ConversationWidgetState extends State<ConversationWidget> {
             children: <Widget>[
               Stack(
                 children: <Widget>[
+                  widget.model.photoUrl != null ?
                   CircleAvatar(
                     backgroundImage: Image.network(widget.model.photoUrl).image,
-                  ),
+                  ) : Container(),
                   Positioned(
                     bottom: 3,
                     right: 3,

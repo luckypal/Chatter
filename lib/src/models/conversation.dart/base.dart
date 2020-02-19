@@ -48,4 +48,6 @@ abstract class ConversationModel {
         this._createdTime = createdTime;
   
   Future<void> save();
+
+  Future<void> loadUsersForConversation();
 }

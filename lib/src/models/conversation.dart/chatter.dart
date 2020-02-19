@@ -98,7 +98,7 @@ class ChatterConversationModel extends ConversationModel {
 
   bool get hasUnreadMessage => unreadMessageCount != 0;
 
-  String get title => userIds.length == 2 ? userModel[0].userName : super.title;
+  String get title => (userIds.length == 2 && userModel != null) ? userModel[0].userName : super.title;
 
   bool get hasLastMessage => true;
   String get lastMessage => "This is last message.";
@@ -146,6 +146,7 @@ class ChatterConversationModel extends ConversationModel {
     });
   }
 
+  @override
   Future<void> loadUsersForConversation() async {
     if (userIds.length == 2) {
       //One-to-one chat

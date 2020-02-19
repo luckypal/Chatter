@@ -98,12 +98,18 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendMessage(String message, int messageType) async {
-    if (conversationModel == null)
-      conversationModel = await multiConversationService.createConversation(
+    ConversationModel model = conversationModel;
+
+    if (model == null) {
+      model = await multiConversationService.createConversation(
           widget.title, widget.contacts, widget.platform);
+      setState(() {
+        conversationModel = model;
+      });
+    }
 
     MessageModel messageModel = await multiConversationService.sendMessage(
-        conversationModel, message, messageType);
+        model, message, messageType);
 
     Timer(Duration(milliseconds: 100), () {
       myController.clear();
@@ -333,9 +339,11 @@ class _ChatPageState extends State<ChatPage> {
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Expanded(
-              child: widget.model != null ? Container(
-                child: multiConversationService.streamBuilder(key: _myListKey, conversationModel: widget.model)
-              ) : Container(),
+              child: conversationModel != null
+                  ? Container(
+                      child: multiConversationService.streamBuilder(
+                          key: _myListKey, conversationModel: conversationModel))
+                  : Container(),
               /*AnimatedList(
               key: _myListKey,
               reverse: true,
